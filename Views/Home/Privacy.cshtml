@@ -1,7 +1,39 @@
 ﻿@{
-    ViewData["Title"] = "Libreria";
+    ViewData["Title"] = "Librería de Ejercicios";
+    
+    // Diccionario simulando datos que podrían venir de tu base de datos
+    var ejerciciosPorMusculo = new Dictionary<string, List<string>>
+    {
+        { "Pecho", new List<string> { "Press de banca", "Flexiones de pecho", "Aperturas con mancuernas" } },
+        { "Espalda", new List<string> { "Dominadas", "Remo con barra", "Jalón al pecho" } },
+        { "Piernas", new List<string> { "Sentadillas", "Prensa de piernas", "Peso muerto rumano" } },
+        { "Hombros", new List<string> { "Press militar", "Elevaciones laterales", "Pájaros" } },
+        { "Brazos", new List<string> { "Curl de bíceps", "Extensiones de tríceps", "Fondos en paralelas" } },
+        { "Abdomen", new List<string> { "Plancha abdominal", "Elevación de piernas", "Crunches" } }
+    };
 }
+
 <h1>@ViewData["Title"]</h1>
 
 <h2>Encuentra una cantidad de ejercicios los cuales pueden ser de utilidad para ti</h2>
-<p>Lista por musculo</p>
+<p>Lista por músculo:</p>
+
+<!-- Usando una estructura de grilla simple, compatible con frameworks como Bootstrap -->
+<div class="row">
+    @foreach (var musculo in ejerciciosPorMusculo)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <strong>@musculo.Key</strong>
+                </div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var ejercicio in musculo.Value)
+                    {
+                        <li class="list-group-item">@ejercicio</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    }
+</div>

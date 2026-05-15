@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("OverLoad")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8b3bad58b1d1ac9c073bcb71b5f0e79d9aef2621")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+00a3e1f486cc739af0e4e201f7979712c38d82a9")]
 [assembly: System.Reflection.AssemblyProductAttribute("OverLoad")]
 [assembly: System.Reflection.AssemblyTitleAttribute("OverLoad")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
