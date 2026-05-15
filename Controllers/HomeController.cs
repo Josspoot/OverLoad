@@ -10,8 +10,7 @@ public class HomeController : Controller
     {
         return View();
     }
-
-    // AGREGAMOS ESTE MÉTODO PARA CONECTAR TU VISTA
+    
     public IActionResult Tracker() 
     {
         return View();
