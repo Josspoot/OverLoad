@@ -1,31 +1,107 @@
-html {
-  font-size: 14px;
-}
+/* Importamos una fuente deportiva y agresiva */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,700;0,900;1,900&display=swap');
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+:root {
+  --neon-blue: #00f3ff;
+  --neon-purple: #bc13fe;
+  --dark-bg: #0b0f19;
+  --glass-bg: rgba(20, 25, 35, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.08);
 }
 
 body {
-  margin-bottom: 60px;
+  font-family: 'Montserrat', sans-serif;
+  color: #ffffff;
+  /* Fondo animado dinámico */
+  background: linear-gradient(-45deg, #0b0f19, #1a0b2e, #0b1a2e, #0b0f19);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  min-height: 100vh;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+/* Animación del fondo */
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+/* Estilo Glassmorphism para las tarjetas */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  color: white;
+  transition: transform 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Botones Neón Motivadores */
+.btn-neon {
+  position: relative;
+  display: inline-block;
+  padding: 12px 28px;
+  color: var(--neon-blue);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-decoration: none;
+  background: transparent;
+  border: 2px solid var(--neon-blue);
+  border-radius: 8px;
+  transition: 0.4s;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.btn-neon:hover {
+  color: #000;
+  background: var(--neon-blue);
+  box-shadow: 0 0 10px var(--neon-blue), 0 0 40px var(--neon-blue), 0 0 80px var(--neon-blue);
+}
+
+/* Variante botón peligro (eliminar) */
+.btn-neon-danger {
+  border-color: #ff3366;
+  color: #ff3366;
+}
+.btn-neon-danger:hover {
+  color: #fff;
+  background: #ff3366;
+  box-shadow: 0 0 15px #ff3366, 0 0 30px #ff3366;
+}
+
+/* Inputs personalizados para el modo oscuro */
+.form-control.dark-input, .form-select.dark-input {
+  background-color: rgba(0,0,0,0.4);
+  border: 1px solid var(--glass-border);
+  color: white;
+}
+.form-control.dark-input:focus, .form-select.dark-input:focus {
+  background-color: rgba(0,0,0,0.6);
+  color: white;
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
+/* Tablas cyberpunk */
+.table-dark-glass {
+  color: white;
+  background: transparent;
+}
+.table-dark-glass th {
+  background-color: rgba(0,0,0,0.5);
+  color: var(--neon-blue);
+  border-bottom: 2px solid var(--neon-blue);
+}
+.table-dark-glass td {
+  border-color: rgba(255,255,255,0.1);
+  background-color: rgba(0,0,0,0.2);
+  vertical-align: middle;
 }
