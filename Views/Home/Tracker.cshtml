@@ -1,19 +1,97 @@
+@model IEnumerable<OverLoad.Models.Ejercicio>
+
 @{
     ViewData["Title"] = "Tracker";
 }
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>@ViewData["Title"]</title>
-</head>
-<body>
-<div>
-    <main>
-        <section>
-            <h1>Trackea tu progreso con nosotros</h1>
-        </section>
-    </main>
+<div class="container mt-4">
+    <h1 class="mb-4">Trackea tu progreso con nosotros</h1>
+
+    <div class="card shadow-sm mb-5">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Añadir Ejercicio</h5>
+        </div>
+        <div class="card-body">
+            <form asp-controller="Tracker" asp-action="Crear" method="post" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Nombre</label>
+                    <input type="text" name="Nombre" class="form-control" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Área de enfoque</label>
+                    <select name="Enfoque" class="form-select" required>
+                        <option value="">Selecciona...</option>
+                        <option value="Pecho">Pecho</option>
+                        <option value="Espalda">Espalda</option>
+                        <option value="Piernas">Piernas</option>
+                        <option value="Hombros">Hombros</option>
+                        <option value="Brazos">Brazos</option>
+                        <option value="Core">Core</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label">Series</label>
+                    <input type="number" name="Series" class="form-control" min="1" required>
+                </div>
+                <div class="col-md-1">
+                    <label class="form-label">Reps</label>
+                    <input type="number" name="Repeticiones" class="form-control" min="1" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Peso (kg)</label>
+                    <input type="number" step="0.5" name="Peso" class="form-control" min="0" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Esfuerzo (1-10)</label>
+                    <input type="number" name="Esfuerzo" class="form-control" min="1" max="10" required>
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-primary w-100">+</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <h3 class="mb-3">Tus Ejercicios</h3>
+    
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No hay ejercicios registrados. ¡Añade uno arriba!</div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Enfoque</th>
+                        <th>Series x Repeticiones</th>
+                        <th>Último Peso</th>
+                        <th>Nueva Carga</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ejercicio in Model)
+                    {
+                        <tr>
+                            <td class="fw-bold">@ejercicio.Nombre</td>
+                            <td><span class="badge bg-secondary">@ejercicio.Enfoque</span></td>
+                            <td>@ejercicio.Series x @ejercicio.Repeticiones</td>
+                            <td>@ejercicio.Peso kg</td>
+                            <td>
+                                <form asp-controller="Tracker" asp-action="NuevaCarga" method="post" class="d-flex gap-2">
+                                    <input type="hidden" name="id" value="@ejercicio.Id" />
+                                    <input type="number" name="nuevasSeries" class="form-control form-control-sm" value="@ejercicio.Series" style="width: 60px" min="1" required>
+                                    <span class="mt-1">x</span>
+                                    <input type="number" name="nuevasRepeticiones" class="form-control form-control-sm" value="@ejercicio.Repeticiones" style="width: 60px" min="1" required>
+                                    <button type="submit" class="btn btn-success btn-sm">Actualizar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
 </div>
-</body>
-</html>
