@@ -2,7 +2,23 @@
     ViewData["Title"] = "OverLoad";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Don't just lift. Progress.</h1>
-    <p></p>
+<div>
+    <h1>Don't just lift. Progress.</h1>
+    <p>Bienvenido a OverLoad. Una herramienta diseñada para gestionar tus entrenamientos.</p>
+
+    <section>
+        <h2>Secciones disponibles</h2>
+        
+        <div>
+            <h3>Tracker de Entrenamiento</h3>
+            <p>Registra tus series, repeticiones y el peso de tus ejercicios para ver tu progreso real.</p>
+            <a asp-controller="Tracker" asp-action="Index">Ir al Tracker</a>
+        </div>
+
+        <div>
+            <h3>Librería de Ejercicios</h3>
+            <p>Consulta una lista de ejercicios clasificados por grupos musculares.</p>
+            <a asp-controller="Home" asp-action="Privacy">Libreria</a>
+        </div>
+    </section>
 </div>
