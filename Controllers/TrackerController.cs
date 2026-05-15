@@ -1,44 +1,54 @@
 using Microsoft.AspNetCore.Mvc;
 using OverLoad.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace OverLoad.Controllers;
 
 public class TrackerController : Controller
 {
-    // LISTA ESTÁTICA: Actúa como nuestra base de datos temporal en memoria
     private static List<Ejercicio> _ejercicios = new List<Ejercicio>();
-    private static int _contadorId = 1; // Para simular el Id autoincrementable
+    private static int _contadorId = 1;
 
-    // Mostrar la pantalla principal con la lista
     public IActionResult Index()
     {
         return View(_ejercicios);
     }
 
-    // Recibe los datos del formulario y los guarda en la lista
     [HttpPost]
     public IActionResult Crear(Ejercicio nuevoEjercicio)
     {
-        nuevoEjercicio.Id = _contadorId++; // Asignamos un ID único
+        nuevoEjercicio.Id = _contadorId++;
         _ejercicios.Add(nuevoEjercicio);
-        
-        return RedirectToAction("Index"); // Recarga la página
+        return RedirectToAction("Index");
     }
 
-    // Actualiza las series y repeticiones del ejercicio existente
     [HttpPost]
     public IActionResult NuevaCarga(int id, int nuevasSeries, int nuevasRepeticiones)
     {
-        // Buscamos el ejercicio en la lista por su ID
+        var ejercicio = _ejercicios.FirstOrDefault(e => e.Id == id);
+        if (ejercicio != null)
+        {
+            ejercicio.Series = nuevasSeries;
+            ejercicio.Repeticiones = nuevasRepeticiones;
+        }
+        return RedirectToAction("Index");
+    }
+
+    // --- NUEVO MÉTODO PARA ELIMINAR ---
+    [HttpPost]
+    public IActionResult Eliminar(int id)
+    {
+        // Buscamos el ejercicio por su ID
         var ejercicio = _ejercicios.FirstOrDefault(e => e.Id == id);
         
         if (ejercicio != null)
         {
-            // Modificamos solo las series y repeticiones
-            ejercicio.Series = nuevasSeries;
-            ejercicio.Repeticiones = nuevasRepeticiones;
+            // Si lo encuentra, lo removemos de la lista
+            _ejercicios.Remove(ejercicio);
         }
         
+        // Recargamos la página
         return RedirectToAction("Index");
     }
 }

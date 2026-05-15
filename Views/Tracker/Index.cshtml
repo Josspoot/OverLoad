@@ -68,7 +68,8 @@
                         <th>Enfoque</th>
                         <th>Series x Repeticiones</th>
                         <th>Último Peso</th>
-                        <th>Nueva Carga</th>
+                        <th>Nueva Carga (series x reps)</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -86,6 +87,12 @@
                                     <span class="mt-1">x</span>
                                     <input type="number" name="nuevasRepeticiones" class="form-control form-control-sm" value="@ejercicio.Repeticiones" style="width: 60px" min="1" required>
                                     <button type="submit" class="btn btn-success btn-sm">Actualizar</button>
+                                </form>
+                            </td>
+                            <td>
+                                <form asp-controller="Tracker" asp-action="Eliminar" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar @ejercicio.Nombre? Esta acción no se puede deshacer.');">
+                                    <input type="hidden" name="id" value="@ejercicio.Id" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
                                 </form>
                             </td>
                         </tr>
