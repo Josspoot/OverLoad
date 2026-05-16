@@ -2,23 +2,57 @@
     ViewData["Title"] = "OverLoad";
 }
 
-<div>
-    <h1>Don't just lift. Progress.</h1>
-    <p>Bienvenido a OverLoad. Una herramienta diseñada para gestionar tus entrenamientos.</p>
+<div class="page-wrapper" style="min-height: 90vh; display: flex; flex-direction: column; justify-content: center; padding-top: 20px;">
+    
+    <div class="bg-watermark" style="top: 35%;">OVERLOAD</div>
 
-    <section>
-        <h2>Secciones disponibles</h2>
+    <div class="container content-container text-center">
         
-        <div>
-            <h3>Tracker de Entrenamiento</h3>
-            <p>Registra tus series, repeticiones y el peso de tus ejercicios para ver tu progreso real.</p>
-            <a asp-controller="Tracker" asp-action="Index">Ir al Tracker</a>
-        </div>
+        <h1 class="display-giant" style="font-size: 8vw; line-height: 0.85; text-shadow: 0 25px 50px rgba(0,0,0,0.9); margin-bottom: 20px;">
+            Don't just lift.<br>
+            <span style="color: var(--accent-red);">Progress.</span>
+        </h1>
+        
+        <p class="mx-auto" style="font-family: var(--font-body); font-size: 1.3rem; font-weight: 300; color: #888; max-width: 650px; margin-bottom: 40px;">
+            Bienvenido a OverLoad. Una herramienta diseñada para gestionar tus entrenamientos.
+        </p>
+        
+        <a asp-controller="Home" asp-action="Tracker" class="btn-pill-red" style="font-size: 1.2rem; padding: 16px 45px;">
+            Start Tracking
+        </a>
 
-        <div>
-            <h3>Librería de Ejercicios</h3>
-            <p>Consulta una lista de ejercicios clasificados por grupos musculares.</p>
-            <a asp-controller="Home" asp-action="Privacy">Libreria</a>
+        <div class="row justify-content-center g-5 mt-5 text-start">
+            
+            <div class="col-lg-5">
+                <div class="street-card h-100 d-flex flex-column">
+                    <div>
+                        <span class="card-badge">Data</span>
+                        <h3 style="font-size: 2.2rem; margin-bottom: 15px;">Tracker de Entrenamiento</h3>
+                        <p style="color: #888; font-family: var(--font-body); font-size: 1rem; line-height: 1.6; margin-bottom: 30px;">
+                            Registra tus series, repeticiones y el peso de tus ejercicios para ver tu progreso real. Todo calculado. Todo medido.
+                        </p>
+                    </div>
+                    <div class="mt-auto">
+                        <a class="btn-update-street d-inline-block text-center" asp-controller="Home" asp-action="Tracker">Ir al Tracker</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="street-card h-100 d-flex flex-column">
+                    <div>
+                        <span class="card-badge">Explore</span>
+                        <h3 style="font-size: 2.2rem; margin-bottom: 15px;">Librería de Ejercicios</h3>
+                        <p style="color: #888; font-family: var(--font-body); font-size: 1rem; line-height: 1.6; margin-bottom: 30px;">
+                            Consulta una lista de ejercicios clasificados por grupos musculares. Encuentra tu próxima variante.
+                        </p>
+                    </div>
+                    <div class="mt-auto">
+                        <a class="btn-update-street d-inline-block text-center" asp-controller="Home" asp-action="Privacy">Ver Librería</a>
+                    </div>
+                </div>
+            </div>
+
         </div>
-    </section>
+    </div>
 </div>

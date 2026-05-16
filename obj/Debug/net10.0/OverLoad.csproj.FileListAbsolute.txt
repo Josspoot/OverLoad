@@ -204,7 +204,6 @@
 /Users/Joss/RiderProjects/OverLoad/OverLoad/obj/Debug/net10.0/compressed/nezrqnk58p-{0}-muycvpuwrr-muycvpuwrr.gz
 /Users/Joss/RiderProjects/OverLoad/OverLoad/obj/Debug/net10.0/compressed/v0zgfp0y55-{0}-87fc7y1x7t-87fc7y1x7t.gz
 /Users/Joss/RiderProjects/OverLoad/OverLoad/obj/Debug/net10.0/compressed/yfc7ypekbg-{0}-mlv21k5csn-mlv21k5csn.gz
-/Users/Joss/RiderProjects/OverLoad/OverLoad/obj/Debug/net10.0/compressed/c3yv0ob4sx-{0}-lugek5hnai-lugek5hnai.gz
 /Users/Joss/RiderProjects/OverLoad/OverLoad/obj/Debug/net10.0/compressed/n4rx3rcgw5-{0}-61n19gt1b8-61n19gt1b8.gz
 /Users/Joss/RiderProjects/OverLoad/OverLoad/obj/Debug/net10.0/compressed/fnfh61zmny-{0}-fr7q2aak1r-fr7q2aak1r.gz
 /Users/Joss/RiderProjects/OverLoad/OverLoad/obj/Debug/net10.0/compressed/r1dux070sz-{0}-bqjiyaj88i-bqjiyaj88i.gz
@@ -280,3 +279,4 @@
 /Users/Joss/RiderProjects/OverLoad/OverLoad/obj/Debug/net10.0/OverLoad.genruntimeconfig.cache
 /Users/Joss/RiderProjects/OverLoad/OverLoad/obj/Debug/net10.0/ref/OverLoad.dll
 /Users/Joss/RiderProjects/OverLoad/OverLoad/obj/Debug/net10.0/OverLoad.sourcelink.json
+/Users/Joss/RiderProjects/OverLoad/OverLoad/obj/Debug/net10.0/compressed/c3yv0ob4sx-{0}-60jptker5i-60jptker5i.gz

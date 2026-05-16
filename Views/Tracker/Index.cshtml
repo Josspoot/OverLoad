@@ -4,101 +4,105 @@
     ViewData["Title"] = "Tracker";
 }
 
-<div class="container mt-4">
-    <h1 class="mb-4">Trackea tu progreso con nosotros</h1>
+<div class="page-wrapper">
+    <div class="bg-watermark">PROGRESS</div>
 
-    <div class="card shadow-sm mb-5">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">Añadir Ejercicio</h5>
-        </div>
-        <div class="card-body">
-            <form asp-controller="Tracker" asp-action="Crear" method="post" class="row g-3 align-items-end">
+    <div class="container content-container">
+        <h1 class="display-1 fw-bold mb-5" style="font-size: 5.5rem;">Trackea tu progreso con nosotros</h1>
+
+        <div class="street-card mb-5">
+            <span class="card-badge">Input</span>
+            <h5 class="mb-4" style="font-size: 2rem; color: var(--accent-red);">Añadir Ejercicio</h5>
+            
+            <form asp-controller="Home" asp-action="Crear" method="post" class="row g-4 align-items-end">
                 <div class="col-md-3">
-                    <label class="form-label">Nombre</label>
-                    <input type="text" name="Nombre" class="form-control" required>
+                    <label class="street-label">Nombre</label>
+                    <input type="text" name="Nombre" class="form-control street-input" placeholder="Ej. Peso Muerto" required>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Área de enfoque</label>
-                    <select name="Enfoque" class="form-select" required>
-                        <option value="">Selecciona...</option>
-                        <option value="Pecho">Pecho</option>
-                        <option value="Espalda">Espalda</option>
-                        <option value="Piernas">Piernas</option>
-                        <option value="Hombros">Hombros</option>
-                        <option value="Brazos">Brazos</option>
-                        <option value="Core">Core</option>
+                    <label class="street-label">Área de enfoque</label>
+                    <select name="Enfoque" class="form-select street-select" required>
+                        <option value="" style="color: black;">Selecciona...</option>
+                        <option value="Pecho" style="color: black;">Pecho</option>
+                        <option value="Espalda" style="color: black;">Espalda</option>
+                        <option value="Piernas" style="color: black;">Piernas</option>
+                        <option value="Hombros" style="color: black;">Hombros</option>
+                        <option value="Brazos" style="color: black;">Brazos</option>
+                        <option value="Core" style="color: black;">Core</option>
                     </select>
                 </div>
                 <div class="col-md-1">
-                    <label class="form-label">Series</label>
-                    <input type="number" name="Series" class="form-control" min="1" required>
+                    <label class="street-label">Series</label>
+                    <input type="number" name="Series" class="form-control street-input text-center" min="1" required>
                 </div>
                 <div class="col-md-1">
-                    <label class="form-label">Reps</label>
-                    <input type="number" name="Repeticiones" class="form-control" min="1" required>
+                    <label class="street-label">Reps</label>
+                    <input type="number" name="Repeticiones" class="form-control street-input text-center" min="1" required>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Peso (kg)</label>
-                    <input type="number" step="0.5" name="Peso" class="form-control" min="0" required>
+                    <label class="street-label">Peso (kg)</label>
+                    <input type="number" step="0.5" name="Peso" class="form-control street-input text-center" min="0" required>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Esfuerzo (1-10)</label>
-                    <input type="number" name="Esfuerzo" class="form-control" min="1" max="10" required>
+                    <label class="street-label">Esfuerzo (1-10)</label>
+                    <input type="number" name="Esfuerzo" class="form-control street-input text-center" min="1" max="10" required>
                 </div>
                 <div class="col-md-1">
-                    <button type="submit" class="btn btn-primary w-100">+</button>
+                    <button type="submit" class="btn-pill-red w-100" style="padding: 12px 0;">+</button>
                 </div>
             </form>
         </div>
-    </div>
 
-    <h3 class="mb-3">Tus Ejercicios</h3>
-    
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info">No hay ejercicios registrados. ¡Añade uno arriba!</div>
-    }
-    else
-    {
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Nombre</th>
-                        <th>Enfoque</th>
-                        <th>Series x Repeticiones</th>
-                        <th>Último Peso</th>
-                        <th>Nueva Carga (series x reps)</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var ejercicio in Model)
-                    {
+        <h3 class="display-3 mb-4">Tus Ejercicios</h3>
+        
+        @if (Model == null || !Model.Any())
+        {
+            <div class="street-card p-4 text-center text-white-50" style="font-size: 1.1rem;">
+                No hay ejercicios registrados. ¡Añade uno arriba!
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive street-table-wrapper">
+                <table class="table street-table align-middle">
+                    <thead>
                         <tr>
-                            <td class="fw-bold">@ejercicio.Nombre</td>
-                            <td><span class="badge bg-secondary">@ejercicio.Enfoque</span></td>
-                            <td>@ejercicio.Series x @ejercicio.Repeticiones</td>
-                            <td>@ejercicio.Peso kg</td>
-                            <td>
-                                <form asp-controller="Tracker" asp-action="NuevaCarga" method="post" class="d-flex gap-2">
-                                    <input type="hidden" name="id" value="@ejercicio.Id" />
-                                    <input type="number" name="nuevasSeries" class="form-control form-control-sm" value="@ejercicio.Series" style="width: 60px" min="1" required>
-                                    <span class="mt-1">x</span>
-                                    <input type="number" name="nuevasRepeticiones" class="form-control form-control-sm" value="@ejercicio.Repeticiones" style="width: 60px" min="1" required>
-                                    <button type="submit" class="btn btn-success btn-sm">Actualizar</button>
-                                </form>
-                            </td>
-                            <td>
-                                <form asp-controller="Tracker" asp-action="Eliminar" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar @ejercicio.Nombre? Esta acción no se puede deshacer.');">
-                                    <input type="hidden" name="id" value="@ejercicio.Id" />
-                                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
-                                </form>
-                            </td>
+                            <th>Nombre</th>
+                            <th>Enfoque</th>
+                            <th>Series x Repeticiones</th>
+                            <th>Último Peso</th>
+                            <th>Nueva Carga (series x reps)</th>
+                            <th>Acciones</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    }
+                    </thead>
+                    <tbody>
+                        @foreach (var ejercicio in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold text-white" style="font-size: 1.2rem;">@ejercicio.Nombre</td>
+                                <td><span class="badge border border-light text-white bg-transparent" style="letter-spacing: 0.5px; font-weight: 600;">@ejercicio.Enfoque</span></td>
+                                <td class="fw-bold" style="font-size: 1.1rem;">@ejercicio.Series x @ejercicio.Repeticiones</td>
+                                <td style="font-size: 1.1rem; color: var(--accent-red); font-weight: 700;">@ejercicio.Peso kg</td>
+                                <td>
+                                    <form asp-controller="Home" asp-action="NuevaCarga" method="post" class="d-flex gap-2">
+                                        <input type="hidden" name="id" value="@ejercicio.Id" />
+                                        <input type="number" name="nuevasSeries" class="form-control street-input form-control-sm text-center fw-bold" value="@ejercicio.Series" style="width: 55px" min="1" required>
+                                        <span class="mt-2 text-white-50">x</span>
+                                        <input type="number" name="nuevasRepeticiones" class="form-control street-input form-control-sm text-center fw-bold" value="@ejercicio.Repeticiones" style="width: 55px" min="1" required>
+                                        <button type="submit" class="btn-update-street">Actualizar</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form asp-controller="Home" asp-action="Eliminar" method="post" onsubmit="return confirm('¿Estás seguro de que deseas eliminar @ejercicio.Nombre? Esta acción no se puede deshacer.');">
+                                        <input type="hidden" name="id" value="@ejercicio.Id" />
+                                        <button type="submit" class="btn-delete-street">Eliminar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
 </div>
