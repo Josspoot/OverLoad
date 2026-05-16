@@ -19,6 +19,14 @@ La problemática se centra en la premisa de **cómo estructurar un entrenamiento
 * Un control de elementos como lista de ejercicios, recomendaciones, imágenes y satisfacción del ejercicio.
 * Un diseño atractivo a la vista, basado en el tema en el que tomamos punto (modo oscuro).
 * Implementar las tecnologías de .NET (C#, HTML, CSS).
+---
+# Imagenes del sistema 
+<img width="1440" height="810" alt="image" src="https://github.com/user-attachments/assets/43a5490f-dd39-43f6-9c45-5fe78e621e60" />
+<img width="1440" height="810" alt="image" src="https://github.com/user-attachments/assets/fdd53e9e-1b4f-40fc-881e-188497f9c58b" />
+<img width="1440" height="808" alt="image" src="https://github.com/user-attachments/assets/963b537c-13e9-4e62-9220-28988c2ae70a" />
+
+
+
 
 ---
 
