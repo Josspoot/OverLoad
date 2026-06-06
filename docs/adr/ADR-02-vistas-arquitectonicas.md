@@ -132,3 +132,31 @@ graph TB
 ```
 
 ---
+
+## Vista de Despliegue
+
+Muestra las capas lógicas del sistema y cómo se comunican entre sí a través de protocolos y puertos definidos.
+
+```mermaid
+graph LR
+    subgraph Presentacion["Capa de Presentación"]
+        Browser["Navegador Web\n(Cliente)"]
+    end
+
+    subgraph Aplicacion["Capa de Aplicación\nlocalhost"]
+        MVC["ASP.NET Core MVC\nControllers + Views"]
+        Auth["ASP.NET Identity\nAutenticación / Sesión"]
+        EF["EF Core\nSQLite Provider"]
+    end
+
+    subgraph Datos["Capa de Datos"]
+        SQLiteFile[("SQLite\napp.db")]
+    end
+
+    Browser -->|"HTTPS :7001\nHTTP :5001"| MVC
+    MVC <--> Auth
+    MVC --> EF
+    EF <-->|"SQL"| SQLiteFile
+```
+
+---
