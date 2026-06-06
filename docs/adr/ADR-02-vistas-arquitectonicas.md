@@ -99,3 +99,36 @@ classDiagram
 ```
 
 ---
+
+## Vista Física
+
+Describe cómo los artefactos de software se distribuyen sobre los nodos de hardware. En el estado actual del proyecto, todo corre en una sola máquina de desarrollo.
+
+```mermaid
+graph TB
+    subgraph Cliente["Dispositivo del Usuario"]
+        Browser["Navegador Web\nChrome / Firefox / Safari"]
+    end
+
+    subgraph Servidor["Máquina de Desarrollo / Servidor"]
+        subgraph DotNet[".NET 10 Runtime"]
+            Kestrel["Kestrel HTTP Server\n(puerto 5001 / 7001)"]
+            App["OverLoad.dll\nASP.NET Core MVC"]
+            IdentityMW["ASP.NET Identity\nMiddleware"]
+            EFCore["Entity Framework Core\nSQLite Provider"]
+            InMemory["Lista en Memoria\nList&lt;Ejercicio&gt;"]
+        end
+        DB[("app.db\nSQLite")]
+        Static["wwwroot/\nCSS, JS, imágenes"]
+    end
+
+    Browser -->|"HTTP / HTTPS"| Kestrel
+    Kestrel --> App
+    App --> IdentityMW
+    App --> EFCore
+    App --> InMemory
+    EFCore --> DB
+    App --> Static
+```
+
+---
