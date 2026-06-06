@@ -38,3 +38,64 @@ Cada vista refleja el estado actual del proyecto: una aplicación **ASP.NET Core
 * Al evolucionar el sistema (e.g., migrar de lista en memoria a base de datos real), los diagramas deben actualizarse para mantener consistencia.
 
 ---
+
+## Vista Lógica
+
+Muestra las clases principales del sistema, sus responsabilidades y relaciones. El patrón MVC divide el sistema en tres capas: **Controladores** (lógica de solicitudes), **Modelos** (datos del dominio) y **Vistas** (presentación HTML).
+
+```mermaid
+classDiagram
+    direction TB
+
+    class HomeController {
+        -List~Ejercicio~ _ejercicios
+        -int _contadorId
+        +Index() IActionResult
+        +Privacy() IActionResult
+        +Tracker() IActionResult
+        +Crear(Ejercicio) IActionResult
+        +NuevaCarga(int,int,int,double) IActionResult
+        +Eliminar(int) IActionResult
+        +Error() IActionResult
+    }
+
+    class TrackerController {
+        -List~Ejercicio~ _ejercicios
+        -int _contadorId
+        +Index() IActionResult
+        +Crear(Ejercicio) IActionResult
+        +NuevaCarga(int,int,int) IActionResult
+        +Eliminar(int) IActionResult
+    }
+
+    class LibreriaController {
+    }
+
+    class Ejercicio {
+        +int Id
+        +string Nombre
+        +string Enfoque
+        +int Series
+        +int Repeticiones
+        +double Peso
+        +int Esfuerzo
+    }
+
+    class ApplicationDbContext {
+        <<IdentityDbContext>>
+    }
+
+    class IdentityUser {
+        <<ASP.NET Identity>>
+        +string UserName
+        +string Email
+        +string PasswordHash
+    }
+
+    HomeController "1" --> "*" Ejercicio : gestiona en memoria
+    TrackerController "1" --> "*" Ejercicio : gestiona en memoria
+    ApplicationDbContext --> IdentityUser : persiste
+    HomeController ..> ApplicationDbContext : inyectado via DI
+```
+
+---
