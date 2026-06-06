@@ -160,3 +160,36 @@ graph LR
 ```
 
 ---
+
+## Vista de Procesos
+
+Describe el comportamiento del sistema en tiempo de ejecución. El diagrama muestra el flujo principal: el usuario registra un ejercicio desde el Tracker, el sistema lo procesa y devuelve la vista actualizada.
+
+```mermaid
+sequenceDiagram
+    actor Usuario
+    participant Browser as Navegador
+    participant Router as Middleware / Router
+    participant HC as HomeController
+    participant Memory as Lista en Memoria
+    participant View as Vista Razor (Tracker.cshtml)
+
+    Usuario->>Browser: Llena formulario y presiona "Añadir"
+    Browser->>Router: POST /Home/Crear (form data)
+    Router->>Router: Verifica autenticación (Identity)
+    Router->>HC: Crear(Ejercicio nuevoEjercicio)
+    HC->>Memory: Asigna Id = _contadorId++
+    HC->>Memory: _ejercicios.Add(nuevoEjercicio)
+    Memory-->>HC: Ejercicio guardado en lista
+    HC-->>Browser: RedirectToAction("Tracker")
+
+    Browser->>Router: GET /Home/Tracker
+    Router->>HC: Tracker()
+    HC->>Memory: Obtiene _ejercicios
+    Memory-->>HC: List&lt;Ejercicio&gt;
+    HC->>View: return View(ejercicios)
+    View-->>Browser: HTML con tabla de ejercicios
+    Browser-->>Usuario: Visualiza el ejercicio registrado
+```
+
+---
