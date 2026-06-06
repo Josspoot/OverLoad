@@ -14,7 +14,7 @@
             <span class="card-badge">Input</span>
             <h5 class="mb-4" style="font-size: 2rem; color: var(--accent-red);">Añadir Ejercicio</h5>
             
-            <form asp-controller="Home" asp-action="Crear" method="post" class="row g-4 align-items-end">
+            <form asp-controller="Index" asp-action="Crear" method="post" class="row g-4 align-items-end">
                 <div class="col-md-3">
                     <label class="street-label">Nombre</label>
                     <input type="text" name="Nombre" class="form-control street-input" placeholder="Ej. Peso Muerto" required>
@@ -48,7 +48,7 @@
                     <input type="number" name="Esfuerzo" class="form-control street-input text-center" min="1" max="10" required>
                 </div>
                 <div class="col-md-1">
-                    <button type="submit" class="btn-pill-red w-100" style="padding: 12px 0;">+</button>
+                    <button type="submit" class="btn-pill-red w-100" style="padding: 12px 0;">Añadir</button>
                 </div>
             </form>
         </div>
