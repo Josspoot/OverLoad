@@ -186,7 +186,7 @@ sequenceDiagram
     Browser->>Router: GET /Home/Tracker
     Router->>HC: Tracker()
     HC->>Memory: Obtiene _ejercicios
-    Memory-->>HC: List&lt;Ejercicio&gt;
+    Memory-->>HC: "List<Ejercicio>"
     HC->>View: return View(ejercicios)
     View-->>Browser: HTML con tabla de ejercicios
     Browser-->>Usuario: Visualiza el ejercicio registrado
