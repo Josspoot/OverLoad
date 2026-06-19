@@ -1,0 +1,41 @@
+# Artefactos de compilación de .NET
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+out/
+
+# Base de datos local de SQLite (se genera con las migraciones de EF Core)
+app.db
+app.db-shm
+app.db-wal
+*.db
+*.db-shm
+*.db-wal
+
+# Archivos de usuario / IDE
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Resultados de pruebas y cobertura
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+
+# Logs y temporales
+*.log
+*~
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
