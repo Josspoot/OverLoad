@@ -109,3 +109,106 @@ graph LR
     PortOut --> JsonRepo
     PortOut --> SqliteRepo
 ```
+
+---
+
+## Implementación realizada (18/06/2026)
+
+La decisión dejó de ser solo propuesta: el núcleo hexagonal y el adaptador de persistencia **SQLite** ya están implementados en el código. A continuación se documenta cómo quedó la estructura real, manteniendo todo lo descrito arriba.
+
+### Mapeo de los anillos a carpetas y clases
+
+| Anillo | Rol | Carpeta / Namespace | Tipo |
+|--------|-----|---------------------|------|
+| Núcleo | Puerto de entrada (driving) | `Application/Ports` | `IEjercicioService` |
+| Núcleo | Puerto de salida (driven) | `Application/Ports` | `IEjercicioRepository` |
+| Núcleo | Caso de uso / servicio de aplicación | `Application/Services` | `EjercicioService` |
+| Núcleo | Entidad de dominio | `Models` (`OverLoad.Models`) | `Ejercicio` |
+| Adaptador de salida | Persistencia SQLite con EF Core | `Infrastructure/Persistence` | `EfEjercicioRepository` |
+| Adaptador de entrada | Controlador web MVC | `Controllers` | `HomeController` |
+| Composición | Registro de puertos y adaptadores en DI | raíz | `Program.cs` |
+
+### Decisiones concretas de la implementación
+
+- La entidad `Ejercicio` se **mantuvo en el namespace `OverLoad.Models`** (no se movió a una carpeta `Domain`). El snapshot de Entity Framework Core referencia la entidad por su nombre completo, y moverla habría generado una migración espuria. La arquitectura hexagonal se cumple igualmente, ya que lo decisivo es la **dirección de las dependencias** (el adaptador depende del puerto, no al revés), no la ubicación física del archivo.
+- El `HomeController` dejó de depender de `ApplicationDbContext` y ahora depende **solo del puerto `IEjercicioService`**, por lo que ya no conoce EF Core ni la base de datos.
+- El `EfEjercicioRepository` implementa `IEjercicioRepository` usando `ApplicationDbContext` (SQLite). Es el único punto que conoce EF Core para los ejercicios.
+
+### Conexión de puertos y adaptadores (DI en `Program.cs`)
+
+```csharp
+// Arquitectura hexagonal: se enchufan los adaptadores a los puertos vía DI.
+builder.Services.AddScoped<IEjercicioRepository, EfEjercicioRepository>();
+builder.Services.AddScoped<IEjercicioService, EjercicioService>();
+```
+
+Cambiar de SQLite a un adaptador de archivos JSON sería, llegado el caso, sustituir únicamente la primera línea por la implementación correspondiente, sin tocar el núcleo ni el controlador.
+
+### Estado de los objetivos del ADR
+
+| Objetivo | Estado |
+|----------|--------|
+| Núcleo aislado tras puertos (entrada y salida) | Implementado |
+| Adaptador de salida SQLite / EF Core | Implementado |
+| Adaptador de entrada web (MVC) sobre el puerto | Implementado |
+| Adaptador de salida de archivos (JSON/CSV) | Pendiente (previsto en este ADR) |
+| Adaptador de entrada API REST + cliente móvil | Pendiente (previsto en este ADR) |
+
+### Diagrama de clases de la implementación
+
+Refleja los nombres reales de las clases e interfaces y la dirección de las dependencias hacia el núcleo.
+
+```mermaid
+classDiagram
+    direction LR
+
+    class HomeController {
+        -IEjercicioService ejercicios
+        +Tracker() Task~IActionResult~
+        +Crear(Ejercicio) Task~IActionResult~
+        +NuevaCarga(int,int,int,double) Task~IActionResult~
+        +Eliminar(int) Task~IActionResult~
+    }
+
+    class IEjercicioService {
+        <<puerto de entrada>>
+        +ListarAsync() Task
+        +RegistrarAsync(Ejercicio) Task
+        +ActualizarCargaAsync(int,int,int,double) Task
+        +EliminarAsync(int) Task
+    }
+
+    class EjercicioService {
+        -IEjercicioRepository repositorio
+    }
+
+    class IEjercicioRepository {
+        <<puerto de salida>>
+        +ObtenerTodosAsync() Task
+        +ObtenerPorIdAsync(int) Task
+        +AgregarAsync(Ejercicio) Task
+        +ActualizarAsync(Ejercicio) Task
+        +EliminarAsync(int) Task
+    }
+
+    class EfEjercicioRepository {
+        -ApplicationDbContext context
+    }
+
+    class Ejercicio {
+        +int Id
+        +string Nombre
+        +string Enfoque
+        +int Series
+        +int Repeticiones
+        +double Peso
+        +int Esfuerzo
+    }
+
+    HomeController ..> IEjercicioService : depende del puerto
+    EjercicioService ..|> IEjercicioService : implementa
+    EjercicioService ..> IEjercicioRepository : depende del puerto
+    EfEjercicioRepository ..|> IEjercicioRepository : implementa
+    EfEjercicioRepository ..> Ejercicio : persiste
+    EjercicioService ..> Ejercicio : opera
+```
