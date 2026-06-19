@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using OverLoad.Models;
 
 namespace OverLoad.Data;
 
 public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext(options)
 {
+    public DbSet<Ejercicio> Ejercicios => Set<Ejercicio>();
 }
