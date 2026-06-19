@@ -10,6 +10,7 @@ namespace OverLoad.Application.Ports;
 public interface IEjercicioService
 {
     Task<IReadOnlyList<Ejercicio>> ListarAsync();
+    Task<Ejercicio?> ObtenerAsync(int id);
     Task RegistrarAsync(Ejercicio ejercicio);
     Task ActualizarCargaAsync(int id, int series, int repeticiones, double peso);
     Task EliminarAsync(int id);

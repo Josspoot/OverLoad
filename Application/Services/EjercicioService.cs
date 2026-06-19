@@ -14,6 +14,9 @@ public class EjercicioService(IEjercicioRepository repositorio) : IEjercicioServ
     public Task<IReadOnlyList<Ejercicio>> ListarAsync() =>
         repositorio.ObtenerTodosAsync();
 
+    public Task<Ejercicio?> ObtenerAsync(int id) =>
+        repositorio.ObtenerPorIdAsync(id);
+
     public Task RegistrarAsync(Ejercicio ejercicio) =>
         repositorio.AgregarAsync(ejercicio);
 
