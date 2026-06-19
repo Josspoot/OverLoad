@@ -1,5 +1,7 @@
+using System.Reflection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
 using OverLoad.Application.Ports;
 using OverLoad.Application.Services;
 using OverLoad.Data;
@@ -24,12 +26,39 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<IEjercicioRepository, EfEjercicioRepository>();
 builder.Services.AddScoped<IEjercicioService, EjercicioService>();
 
+// Documentacion de la API REST con OpenAPI / Swagger.
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "OverLoad API",
+        Version = "v1",
+        Description = "API REST para el seguimiento de entrenamientos de fuerza. " +
+                      "Adaptador de entrada de la arquitectura hexagonal (ver ADR-03)."
+    });
+
+    // Incluye los comentarios XML para enriquecer la documentacion.
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+        options.IncludeXmlComments(xmlPath);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
+
+    // Swagger UI disponible en /swagger (solo en desarrollo).
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "OverLoad API v1");
+        options.DocumentTitle = "OverLoad API - Documentacion";
+    });
 }
 else
 {
