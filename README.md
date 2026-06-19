@@ -11,6 +11,8 @@ Aplicación web para el seguimiento y control de entrenamientos físicos. Permit
 ## Tecnologías
 
 - **ASP.NET Core MVC** (.NET 10)
+- **Arquitectura Hexagonal** (puertos y adaptadores)
+- **API REST** documentada con **Swagger / OpenAPI** (Swashbuckle)
 - **Entity Framework Core** + SQLite
 - **ASP.NET Identity** (autenticación de usuarios)
 - **Razor Views** (HTML + CSS con modo oscuro)
@@ -25,6 +27,7 @@ Aplicación web para el seguimiento y control de entrenamientos físicos. Permit
 - Eliminación de ejercicios del tracker
 - Autenticación de usuarios con ASP.NET Identity
 - Diseño oscuro optimizado para uso en gimnasio
+- API REST (CRUD de ejercicios) con documentación interactiva Swagger UI, lista para futuros clientes (móvil)
 
 ---
 
@@ -35,7 +38,23 @@ El proyecto evoluciona hacia una **Arquitectura Hexagonal (Puertos y Adaptadores
 - Exponerse a múltiples canales de entrada (sitio web MVC y, a futuro, un cliente móvil mediante una API REST).
 - Persistir los datos de forma intercambiable a través de puertos: adaptador de **archivos (JSON/CSV)** o adaptador **SQLite/EF Core**.
 
-Esta decisión está documentada en el [`ADR-03`](docs/adr/ADR-03-arquitectura-hexagonal.md) (estado: Propuesto).
+Esta decisión está documentada en el [`ADR-03`](docs/adr/ADR-03-Arquitectura-hexagonal.md).
+
+---
+
+## API REST
+
+Además del sitio web, el núcleo se expone a través de una **API REST** (adaptador de entrada alterno que consume el mismo `IEjercicioService`). Está documentada con **Swagger / OpenAPI**.
+
+| Verbo | Ruta | Acción |
+|-------|------|--------|
+| `GET` | `/api/v1/ejercicios` | Listar todos los ejercicios |
+| `GET` | `/api/v1/ejercicios/{id}` | Obtener un ejercicio |
+| `POST` | `/api/v1/ejercicios` | Crear un ejercicio |
+| `PUT` | `/api/v1/ejercicios/{id}/carga` | Actualizar series, repeticiones y peso |
+| `DELETE` | `/api/v1/ejercicios/{id}` | Eliminar un ejercicio |
+
+**Documentación interactiva (Swagger UI):** con la app corriendo en desarrollo, abre `/swagger` en el navegador para explorar y probar los endpoints. La especificación OpenAPI está en `/swagger/v1/swagger.json`.
 
 ---
 
@@ -43,8 +62,16 @@ Esta decisión está documentada en el [`ADR-03`](docs/adr/ADR-03-arquitectura-h
 
 <pre>
 OverLoad/
-├── Controllers/        # HomeController, TrackerController, LibreriaController
-├── Models/             # Ejercicio.cs, ErrorViewModel.cs
+├── Application/        # Nucleo: puertos (IEjercicioService, IEjercicioRepository) y servicio
+│   ├── Ports/
+│   └── Services/
+├── Infrastructure/     # Adaptadores de salida
+│   └── Persistence/    # EfEjercicioRepository (SQLite/EF Core)
+├── Controllers/        # Adaptadores de entrada
+│   ├── HomeController.cs   # Web MVC
+│   ├── LibreriaController.cs
+│   └── Api/            # API REST (EjerciciosApiController + Contracts/DTOs)
+├── Models/             # Entidad de dominio Ejercicio.cs, ErrorViewModel.cs
 ├── Views/              # Vistas Razor (Home, Tracker, Shared)
 ├── Data/               # ApplicationDbContext, Migrations
 ├── wwwroot/            # Archivos estáticos (CSS, JS)
@@ -60,7 +87,7 @@ La documentación formal de las decisiones de diseño se encuentra en [`docs/adr
 
 - [`ADR-01`](docs/adr/ADR-01-Overload.md) — Elección del stack tecnológico y patrón MVC
 - [`ADR-02`](docs/adr/ADR-02-vistas-arquitectonicas.md) — Vistas arquitectónicas del sistema (lógica, física, despliegue y procesos)
-- [`ADR-03`](docs/adr/ADR-03-arquitectura-hexagonal.md) — Adopción de Arquitectura Hexagonal (puertos y adaptadores) para soportar múltiples canales (web/móvil) y persistencia intercambiable (archivos/SQLite)
+- [`ADR-03`](docs/adr/ADR-03-Arquitectura-hexagonal.md) — Adopción de Arquitectura Hexagonal (puertos y adaptadores) para soportar múltiples canales (web/móvil/API REST) y persistencia intercambiable (archivos/SQLite)
 
 ---
 
@@ -78,8 +105,3 @@ En el desarrollo de este proyecto se utilizó inteligencia artificial (Claude, d
 - **Diseño:** Apoyo en decisiones de estructura y organización del sistema.
 - **Corrección de errores:** Identificación y resolución de bugs durante el desarrollo.
 - **Documentación:** Asistencia en la redacción de ADRs y diagramas arquitectónicos
-
-Cambios que hice:
-- Nueva sección "Arquitectura" que explica el giro hacia hexagonal y enlaza al ADR-03.
-- Lista de ADRs ampliada con el ADR-03.
-- Árbol de estructura actualizado: el comentario de docs/adr/ ahora incluye ADR-03.

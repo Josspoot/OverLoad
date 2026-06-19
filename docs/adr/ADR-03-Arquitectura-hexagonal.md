@@ -126,6 +126,8 @@ La decisión dejó de ser solo propuesta: el núcleo hexagonal y el adaptador de
 | Núcleo | Entidad de dominio | `Models` (`OverLoad.Models`) | `Ejercicio` |
 | Adaptador de salida | Persistencia SQLite con EF Core | `Infrastructure/Persistence` | `EfEjercicioRepository` |
 | Adaptador de entrada | Controlador web MVC | `Controllers` | `HomeController` |
+| Adaptador de entrada | API REST (JSON) | `Controllers/Api` | `EjerciciosApiController` |
+| Contrato API | DTOs de entrada/salida de la API | `Controllers/Api/Contracts` | `CrearEjercicioRequest`, `ActualizarCargaRequest`, `EjercicioResponse` |
 | Composición | Registro de puertos y adaptadores en DI | raíz | `Program.cs` |
 
 ### Decisiones concretas de la implementación
@@ -151,8 +153,9 @@ Cambiar de SQLite a un adaptador de archivos JSON sería, llegado el caso, susti
 | Núcleo aislado tras puertos (entrada y salida) | Implementado |
 | Adaptador de salida SQLite / EF Core | Implementado |
 | Adaptador de entrada web (MVC) sobre el puerto | Implementado |
+| Adaptador de entrada API REST (documentada con Swagger/OpenAPI) | Implementado |
 | Adaptador de salida de archivos (JSON/CSV) | Pendiente (previsto en este ADR) |
-| Adaptador de entrada API REST + cliente móvil | Pendiente (previsto en este ADR) |
+| Cliente móvil consumiendo la API REST | Pendiente (previsto en este ADR) |
 
 ### Diagrama de clases de la implementación
 
@@ -212,3 +215,32 @@ classDiagram
     EfEjercicioRepository ..> Ejercicio : persiste
     EjercicioService ..> Ejercicio : opera
 ```
+
+### API REST y documentación (Swagger / OpenAPI)
+
+Como concreción del objetivo de "múltiples canales de entrada", se implementó una **API REST** (`EjerciciosApiController`) que es un adaptador de entrada alterno al controlador web MVC: ambos consumen el mismo puerto `IEjercicioService`, sin duplicar lógica de negocio.
+
+Endpoints expuestos:
+
+| Verbo | Ruta | Acción | Respuestas |
+|-------|------|--------|-----------|
+| `GET` | `/api/v1/ejercicios` | Listar todos | `200` |
+| `GET` | `/api/v1/ejercicios/{id}` | Obtener uno | `200` / `404` |
+| `POST` | `/api/v1/ejercicios` | Crear | `201` + cabecera `Location` |
+| `PUT` | `/api/v1/ejercicios/{id}/carga` | Actualizar carga | `204` / `404` |
+| `DELETE` | `/api/v1/ejercicios/{id}` | Eliminar | `204` / `404` |
+
+Prácticas aplicadas, alineadas con la industria:
+
+- **DTOs** (`CrearEjercicioRequest`, `ActualizarCargaRequest`, `EjercicioResponse`): el contrato público de la API no expone directamente la entidad de dominio.
+- **Validación** declarativa con DataAnnotations (`[Required]`, `[Range]`), que produce `400 Bad Request` automáticamente.
+- **Códigos HTTP semánticos** y atributos `[ProducesResponseType]` para que la especificación sea precisa.
+- **Versionado** en la ruta (`/api/v1/`) para no romper clientes futuros.
+
+La documentación se genera con **OpenAPI** mediante **Swashbuckle (Swagger)**:
+
+- Especificación machine-readable en `/swagger/v1/swagger.json`.
+- **Swagger UI** interactiva en `/swagger` (habilitada en entorno de desarrollo), donde se pueden explorar y probar todos los endpoints.
+- Los comentarios XML (`///`) del controlador y los DTOs se incluyen en la documentación gracias a `GenerateDocumentationFile`.
+
+> Nota técnica: con .NET 10, Swashbuckle 10 utiliza Microsoft.OpenApi 2.x, donde `OpenApiInfo` reside en el namespace `Microsoft.OpenApi` (antes `Microsoft.OpenApi.Models`).
