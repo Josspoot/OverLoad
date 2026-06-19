@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using OverLoad.Application.Ports;
+using OverLoad.Application.Services;
 using OverLoad.Data;
+using OverLoad.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +17,12 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+// Arquitectura hexagonal: se enchufan los adaptadores a los puertos vía DI.
+// El puerto de entrada (IEjercicioService) y el de salida (IEjercicioRepository)
+// pueden cambiar de implementación sin tocar el núcleo ni los controladores.
+builder.Services.AddScoped<IEjercicioRepository, EfEjercicioRepository>();
+builder.Services.AddScoped<IEjercicioService, EjercicioService>();
 
 var app = builder.Build();
 
