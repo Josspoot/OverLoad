@@ -25,6 +25,7 @@ Aplicación web para el seguimiento y control de entrenamientos físicos. Permit
 - Registro de ejercicios con nombre, área de enfoque, series, repeticiones, peso y esfuerzo
 - Actualización de carga (series, repeticiones y peso) por ejercicio
 - Eliminación de ejercicios del tracker
+- Sugerencia de sobrecarga progresiva por ejercicio, con estrategias intercambiables (por peso, repeticiones, series o doble progresión)
 - Autenticación de usuarios con ASP.NET Identity
 - Diseño oscuro optimizado para uso en gimnasio
 - API REST (CRUD de ejercicios) con documentación interactiva Swagger UI, lista para futuros clientes (móvil)
@@ -52,6 +53,7 @@ Además del sitio web, el núcleo se expone a través de una **API REST** (adapt
 | `GET` | `/api/v1/ejercicios/{id}` | Obtener un ejercicio |
 | `POST` | `/api/v1/ejercicios` | Crear un ejercicio |
 | `PUT` | `/api/v1/ejercicios/{id}/carga` | Actualizar series, repeticiones y peso |
+| `GET` | `/api/v1/ejercicios/{id}/sugerencia?estrategia={clave}` | Sugerir la carga de la próxima sesión (estrategias: `peso`, `repeticiones`, `series`, `doble`) |
 | `DELETE` | `/api/v1/ejercicios/{id}` | Eliminar un ejercicio |
 
 **Documentación interactiva (Swagger UI):** con la app corriendo en desarrollo, abre `/swagger` en el navegador para explorar y probar los endpoints. La especificación OpenAPI está en `/swagger/v1/swagger.json`.
@@ -64,7 +66,8 @@ Además del sitio web, el núcleo se expone a través de una **API REST** (adapt
 OverLoad/
 ├── Application/        # Nucleo: puertos (IEjercicioService, IEjercicioRepository) y servicio
 │   ├── Ports/
-│   └── Services/
+│   ├── Services/
+│   └── Progresion/     # Patron Strategy: IEstrategiaProgresion + estrategias (ADR-04)
 ├── Infrastructure/     # Adaptadores de salida
 │   └── Persistence/    # EfEjercicioRepository (SQLite/EF Core)
 ├── Controllers/        # Adaptadores de entrada
@@ -88,6 +91,7 @@ La documentación formal de las decisiones de diseño se encuentra en [`docs/adr
 - [`ADR-01`](docs/adr/ADR-01-Overload.md) — Elección del stack tecnológico y patrón MVC
 - [`ADR-02`](docs/adr/ADR-02-vistas-arquitectonicas.md) — Vistas arquitectónicas del sistema (lógica, física, despliegue y procesos)
 - [`ADR-03`](docs/adr/ADR-03-Arquitectura-hexagonal.md) — Adopción de Arquitectura Hexagonal (puertos y adaptadores) para soportar múltiples canales (web/móvil/API REST) y persistencia intercambiable (archivos/SQLite)
+- [`ADR-04`](docs/adr/ADR-04-Patron-Strategy-progresion.md) — Patrón Strategy (GoF) para encapsular las estrategias de progresión de carga de forma intercambiable y extensible
 
 ---
 
