@@ -66,6 +66,30 @@ public class EjerciciosApiController(IEjercicioService ejercicios) : ControllerB
         return NoContent();
     }
 
+    /// <summary>Sugiere la carga para la próxima sesión de un ejercicio.</summary>
+    /// <remarks>
+    /// Aplica una estrategia de progresión (patrón Strategy, ver ADR-04).
+    /// Estrategias válidas: <c>peso</c>, <c>repeticiones</c>, <c>series</c>, <c>doble</c>.
+    /// </remarks>
+    /// <param name="id">Identificador del ejercicio.</param>
+    /// <param name="estrategia">Clave de la estrategia de progresión a aplicar.</param>
+    /// <response code="200">Devuelve la carga sugerida y su justificación.</response>
+    /// <response code="400">La estrategia indicada no es válida.</response>
+    /// <response code="404">No existe un ejercicio con ese id.</response>
+    [HttpGet("{id:int}/sugerencia")]
+    [ProducesResponseType(typeof(SugerenciaProgresionResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<SugerenciaProgresionResponse>> Sugerir(int id, [FromQuery] string estrategia = "doble")
+    {
+        var disponibles = ejercicios.EstrategiasDeProgresion();
+        if (!disponibles.Contains(estrategia, StringComparer.OrdinalIgnoreCase))
+            return BadRequest(new { mensaje = "Estrategia no válida.", estrategiasDisponibles = disponibles });
+
+        var sugerencia = await ejercicios.SugerirProgresionAsync(id, estrategia);
+        return sugerencia is null ? NotFound() : Ok(SugerenciaProgresionResponse.From(sugerencia));
+    }
+
     /// <summary>Elimina un ejercicio.</summary>
     /// <param name="id">Identificador del ejercicio.</param>
     /// <response code="204">Ejercicio eliminado.</response>

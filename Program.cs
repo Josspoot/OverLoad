@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
 using OverLoad.Application.Ports;
+using OverLoad.Application.Progresion;
+using OverLoad.Application.Progresion.Estrategias;
 using OverLoad.Application.Services;
 using OverLoad.Data;
 using OverLoad.Infrastructure.Persistence;
@@ -25,6 +27,15 @@ builder.Services.AddControllersWithViews();
 // pueden cambiar de implementación sin tocar el núcleo ni los controladores.
 builder.Services.AddScoped<IEjercicioRepository, EfEjercicioRepository>();
 builder.Services.AddScoped<IEjercicioService, EjercicioService>();
+
+// Patrón Strategy (ver ADR-04): cada algoritmo de sobrecarga progresiva se
+// registra como una implementación de IEstrategiaProgresion. Agregar una nueva
+// estrategia solo requiere registrarla aquí; el selector las recibe todas por DI.
+builder.Services.AddScoped<IEstrategiaProgresion, ProgresionPorPeso>();
+builder.Services.AddScoped<IEstrategiaProgresion, ProgresionPorRepeticiones>();
+builder.Services.AddScoped<IEstrategiaProgresion, ProgresionPorSeries>();
+builder.Services.AddScoped<IEstrategiaProgresion, DobleProgresion>();
+builder.Services.AddScoped<SelectorEstrategiaProgresion>();
 
 // Documentacion de la API REST con OpenAPI / Swagger.
 builder.Services.AddEndpointsApiExplorer();

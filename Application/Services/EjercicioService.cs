@@ -1,4 +1,5 @@
 using OverLoad.Application.Ports;
+using OverLoad.Application.Progresion;
 using OverLoad.Models;
 
 namespace OverLoad.Application.Services;
@@ -9,7 +10,9 @@ namespace OverLoad.Application.Services;
 /// No depende de ASP.NET ni de EF Core, por lo que la lógica es probable de
 /// forma aislada y reutilizable desde cualquier adaptador de entrada.
 /// </summary>
-public class EjercicioService(IEjercicioRepository repositorio) : IEjercicioService
+public class EjercicioService(
+    IEjercicioRepository repositorio,
+    SelectorEstrategiaProgresion selectorProgresion) : IEjercicioService
 {
     public Task<IReadOnlyList<Ejercicio>> ListarAsync() =>
         repositorio.ObtenerTodosAsync();
@@ -33,4 +36,18 @@ public class EjercicioService(IEjercicioRepository repositorio) : IEjercicioServ
 
     public Task EliminarAsync(int id) =>
         repositorio.EliminarAsync(id);
+
+    public IReadOnlyList<string> EstrategiasDeProgresion() =>
+        selectorProgresion.ClavesDisponibles;
+
+    public async Task<CargaSugerida?> SugerirProgresionAsync(int id, string estrategia)
+    {
+        var estrategiaProgresion = selectorProgresion.Resolver(estrategia);
+        if (estrategiaProgresion is null) return null;
+
+        var ejercicio = await repositorio.ObtenerPorIdAsync(id);
+        if (ejercicio is null) return null;
+
+        return estrategiaProgresion.Sugerir(ejercicio);
+    }
 }

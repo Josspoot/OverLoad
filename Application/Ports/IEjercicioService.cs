@@ -1,3 +1,4 @@
+using OverLoad.Application.Progresion;
 using OverLoad.Models;
 
 namespace OverLoad.Application.Ports;
@@ -14,4 +15,14 @@ public interface IEjercicioService
     Task RegistrarAsync(Ejercicio ejercicio);
     Task ActualizarCargaAsync(int id, int series, int repeticiones, double peso);
     Task EliminarAsync(int id);
+
+    /// <summary>Claves de las estrategias de progresión disponibles.</summary>
+    IReadOnlyList<string> EstrategiasDeProgresion();
+
+    /// <summary>
+    /// Sugiere la carga para la próxima sesión de un ejercicio aplicando la
+    /// estrategia de progresión indicada (patrón Strategy).
+    /// Devuelve <c>null</c> si el ejercicio no existe o la estrategia no es válida.
+    /// </summary>
+    Task<CargaSugerida?> SugerirProgresionAsync(int id, string estrategia);
 }
