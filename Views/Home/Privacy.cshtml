@@ -1,112 +1,65 @@
-﻿@{
+@using OverLoad.Application.Libreria
+@model IReadOnlyList<GrupoEjercicios>
+
+@{
     ViewData["Title"] = "Librería";
 }
 
-<div class="page-wrapper" style="min-height: 90vh; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 40px;">
-    
+<div class="page-wrapper" style="min-height: 90vh; padding-top: 40px;">
+
     <div class="bg-watermark" style="top: 25%;">LIBRARY</div>
 
     <div class="container content-container">
-        
+
         <div class="text-center mb-5">
             <h1 class="display-giant" style="font-size: 7vw; line-height: 0.85; text-shadow: 0 25px 50px rgba(0,0,0,0.9); margin-bottom: 20px;">
                 @ViewData["Title"]
             </h1>
             <p class="mx-auto" style="font-family: var(--font-body); font-size: 1.2rem; font-weight: 300; color: #888; max-width: 650px;">
-                Encuentra una cantidad de ejercicios los cuales pueden ser de utilidad para ti. Explora las variantes por grupo muscular.
+                Explora los ejercicios por grupo muscular. Haz click en cualquiera para ver cómo hacerlo,
+                qué debes sentir, recomendaciones y el equipo extra que conviene usar.
             </p>
         </div>
 
         <div class="street-card mx-auto" style="max-width: 1200px;">
             <span class="card-badge">Catalog</span>
             <h3 style="font-size: 2.2rem; margin-bottom: 20px;">Lista por músculo</h3>
-            
+
             <div class="row g-5">
-                
-                <div class="col-md-4 muscle-section mt-4">
-                    <h4 class="muscle-title">Pecho</h4>
-                    <div class="exercise-row">Press de banca plano</div>
-                    <div class="exercise-row">Press de banca inclinado</div>
-                    <div class="exercise-row">Press de banca declinado</div>
-                    <div class="exercise-row">Flexiones de pecho (Push-ups)</div>
-                    <div class="exercise-row">Aperturas con mancuernas</div>
-                    <div class="exercise-row">Cruces en polea alta</div>
-                    <div class="exercise-row">Cruces en polea baja</div>
-                    <div class="exercise-row">Fondos en paralelas (Dips)</div>
-                    <div class="exercise-row">Pullover con mancuerna</div>
-                    <div class="exercise-row">Press en máquina convergente</div>
-                </div>
-                
-                <div class="col-md-4 muscle-section mt-4">
-                    <h4 class="muscle-title">Espalda</h4>
-                    <div class="exercise-row">Dominadas (Pull-ups)</div>
-                    <div class="exercise-row">Dominadas supinas (Chin-ups)</div>
-                    <div class="exercise-row">Remo con barra pesado</div>
-                    <div class="exercise-row">Remo en punta (T-Bar Row)</div>
-                    <div class="exercise-row">Jalón al pecho agarre amplio</div>
-                    <div class="exercise-row">Jalón al pecho agarre cerrado</div>
-                    <div class="exercise-row">Remo con mancuerna a una mano</div>
-                    <div class="exercise-row">Pullover en polea alta</div>
-                    <div class="exercise-row">Peso muerto tradicional</div>
-                    <div class="exercise-row">Hiperextensiones lumbares</div>
-                </div>
-
-                <div class="col-md-4 muscle-section mt-4">
-                    <h4 class="muscle-title">Piernas</h4>
-                    <div class="exercise-row">Sentadilla libre con barra</div>
-                    <div class="exercise-row">Sentadilla frontal</div>
-                    <div class="exercise-row">Sentadilla Búlgara</div>
-                    <div class="exercise-row">Prensa de piernas (Leg Press)</div>
-                    <div class="exercise-row">Peso muerto rumano (RDL)</div>
-                    <div class="exercise-row">Zancadas con mancuernas (Lunges)</div>
-                    <div class="exercise-row">Hip Thrust con barra</div>
-                    <div class="exercise-row">Extensiones de cuádriceps</div>
-                    <div class="exercise-row">Curl de isquios (Acostado o Sentado)</div>
-                    <div class="exercise-row">Elevación de talones (Pantorrillas)</div>
-                </div>
-
-                <div class="col-md-4 muscle-section mt-4">
-                    <h4 class="muscle-title">Hombros</h4>
-                    <div class="exercise-row">Press militar con barra</div>
-                    <div class="exercise-row">Press Arnold con mancuernas</div>
-                    <div class="exercise-row">Elevaciones laterales</div>
-                    <div class="exercise-row">Elevaciones frontales</div>
-                    <div class="exercise-row">Pájaros (Rear delt fly)</div>
-                    <div class="exercise-row">Face pulls en polea</div>
-                    <div class="exercise-row">Remo al cuello (Upright row)</div>
-                    <div class="exercise-row">Encogimientos de hombros (Shrugs)</div>
-                    <div class="exercise-row">Press Bradford</div>
-                </div>
-
-                <div class="col-md-4 muscle-section mt-4">
-                    <h4 class="muscle-title">Brazos</h4>
-                    <div class="exercise-row">Curl de bíceps con barra Z</div>
-                    <div class="exercise-row">Curl martillo con mancuernas</div>
-                    <div class="exercise-row">Curl araña (Spider curl)</div>
-                    <div class="exercise-row">Curl predicador en banco</div>
-                    <div class="exercise-row">Extensiones de tríceps en polea</div>
-                    <div class="exercise-row">Press francés con barra Z</div>
-                    <div class="exercise-row">Rompecráneos (Skullcrushers)</div>
-                    <div class="exercise-row">Fondos de tríceps en banco</div>
-                    <div class="exercise-row">Patada de tríceps (Kickbacks)</div>
-                </div>
-
-                <div class="col-md-4 muscle-section mt-4">
-                    <h4 class="muscle-title">Core</h4>
-                    <div class="exercise-row">Plancha isométrica (Plank)</div>
-                    <div class="exercise-row">Crunches en polea alta</div>
-                    <div class="exercise-row">Elevación de piernas colgado</div>
-                    <div class="exercise-row">Rueda abdominal (Ab wheel)</div>
-                    <div class="exercise-row">Giros rusos (Russian twist)</div>
-                    <div class="exercise-row">Woodchoppers en polea</div>
-                    <div class="exercise-row">Dragon flags</div>
-                    <div class="exercise-row">Toques de talón (Heel touches)</div>
-                    <div class="exercise-row">Bicicletas abdominales</div>
-                </div>
-
+                @foreach (var grupo in Model)
+                {
+                    <div class="col-md-4 muscle-section mt-4">
+                        <h4 class="muscle-title">@grupo.Nombre</h4>
+                        @foreach (var ej in grupo.Ejercicios)
+                        {
+                            <button type="button" class="ejercicio-item"
+                                    data-bs-toggle="modal" data-bs-target="#ejercicioModal"
+                                    data-slug="@ej.Slug"
+                                    data-nombre="@ej.Nombre"
+                                    data-grupo="@ej.Grupo"
+                                    data-como="@ej.ComoHacerlo"
+                                    data-sentir="@ej.QueSeDebeSentir"
+                                    data-reco="@ej.Recomendaciones"
+                                    data-equipo="@ej.EquipoExtra">
+                                <span class="ejercicio-thumb">
+                                    <img src="~/img/ejercicios/@(ej.Slug).jpg" alt="@ej.Nombre"
+                                         loading="lazy"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    <span class="ejercicio-thumb-ph">
+                                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M6.5 6.5l11 11M21 21l-1-1M3 3l1 1M18 22l4-4M2 6l4-4M3 7l4 4M17 13l4 4"/>
+                                        </svg>
+                                    </span>
+                                </span>
+                                <span class="ejercicio-nombre">@ej.Nombre</span>
+                                <span class="ejercicio-arrow">›</span>
+                            </button>
+                        }
+                    </div>
+                }
             </div>
         </div>
-        
+
         <div class="text-center mt-5">
             <a asp-controller="Home" asp-action="Index" class="btn-update-street d-inline-block" style="padding: 10px 30px; font-size: 1.1rem;">
                 Volver al Cuartel
@@ -115,3 +68,70 @@
 
     </div>
 </div>
+
+<!-- MODAL DE DETALLE DEL EJERCICIO -->
+<div class="modal fade" id="ejercicioModal" tabindex="-1" aria-labelledby="ejercicioModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content ejercicio-modal">
+            <div class="modal-header">
+                <div>
+                    <span class="card-badge" id="m-grupo">Grupo</span>
+                    <h5 class="modal-title mt-2" id="ejercicioModalLabel">Ejercicio</h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="ejercicio-modal-img mb-4">
+                    <img id="m-img" src="" alt=""
+                         onerror="this.style.display='none'; document.getElementById('m-img-ph').style.display='flex';">
+                    <div id="m-img-ph" class="ejercicio-modal-ph">
+                        <svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6.5 6.5l11 11M21 21l-1-1M3 3l1 1M18 22l4-4M2 6l4-4M3 7l4 4M17 13l4 4"/>
+                        </svg>
+                        <span>Imagen descriptiva</span>
+                    </div>
+                </div>
+
+                <div class="detalle-bloque">
+                    <h6>Cómo hacerlo</h6>
+                    <p id="m-como"></p>
+                </div>
+                <div class="detalle-bloque">
+                    <h6>Qué se debe sentir</h6>
+                    <p id="m-sentir"></p>
+                </div>
+                <div class="detalle-bloque">
+                    <h6>Recomendaciones</h6>
+                    <p id="m-reco"></p>
+                </div>
+                <div class="detalle-bloque detalle-equipo">
+                    <h6>Equipo extra</h6>
+                    <p id="m-equipo"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('ejercicioModal').addEventListener('show.bs.modal', function (event) {
+            const b = event.relatedTarget;
+            const slug = b.getAttribute('data-slug');
+
+            document.getElementById('ejercicioModalLabel').textContent = b.getAttribute('data-nombre');
+            document.getElementById('m-grupo').textContent = b.getAttribute('data-grupo');
+            document.getElementById('m-como').textContent = b.getAttribute('data-como');
+            document.getElementById('m-sentir').textContent = b.getAttribute('data-sentir');
+            document.getElementById('m-reco').textContent = b.getAttribute('data-reco');
+            document.getElementById('m-equipo').textContent = b.getAttribute('data-equipo');
+
+            const img = document.getElementById('m-img');
+            const ph = document.getElementById('m-img-ph');
+            img.style.display = '';
+            ph.style.display = 'none';
+            img.alt = b.getAttribute('data-nombre');
+            img.src = '/img/ejercicios/' + slug + '.jpg';
+        });
+    </script>
+}

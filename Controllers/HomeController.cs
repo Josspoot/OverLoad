@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using OverLoad.Application.Libreria;
 using OverLoad.Application.Ports;
 using OverLoad.Models;
 
@@ -10,16 +11,17 @@ namespace OverLoad.Controllers;
 /// los casos de uso del núcleo a través del puerto IEjercicioService.
 /// No conoce EF Core ni la base de datos.
 /// </summary>
-public class HomeController(IEjercicioService ejercicios) : Controller
+public class HomeController(IEjercicioService ejercicios, CatalogoEjercicios catalogo) : Controller
 {
     public IActionResult Index()
     {
         return View();
     }
 
+    // Librería de ejercicios con sus fichas descriptivas.
     public IActionResult Privacy()
     {
-        return View();
+        return View(catalogo.ObtenerGrupos());
     }
 
     public async Task<IActionResult> Tracker()

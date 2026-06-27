@@ -1,0 +1,79 @@
+IMÁGENES DE LA LIBRERÍA DE EJERCICIOS
+=====================================
+
+Coloca aquí una imagen por ejercicio con el nombre EXACTO indicado abajo y
+extensión .jpg. La librería las toma automáticamente; si una imagen no existe,
+se muestra un marcador de posición ("Imagen descriptiva") sin romper la página.
+
+Formato recomendado: .jpg, horizontal, ~800x500 px.
+
+Archivos esperados (uno por ejercicio):
+
+PECHO
+  press-banca-plano.jpg
+  press-banca-inclinado.jpg
+  press-banca-declinado.jpg
+  flexiones-pecho.jpg
+  aperturas-mancuernas.jpg
+  cruces-polea-alta.jpg
+  cruces-polea-baja.jpg
+  fondos-paralelas.jpg
+  pullover-mancuerna.jpg
+  press-maquina-convergente.jpg
+
+ESPALDA
+  dominadas.jpg
+  dominadas-supinas.jpg
+  remo-barra.jpg
+  remo-punta.jpg
+  jalon-pecho-amplio.jpg
+  jalon-pecho-cerrado.jpg
+  remo-mancuerna-una-mano.jpg
+  pullover-polea-alta.jpg
+  peso-muerto.jpg
+  hiperextensiones-lumbares.jpg
+
+PIERNAS
+  sentadilla-libre.jpg
+  sentadilla-frontal.jpg
+  sentadilla-bulgara.jpg
+  prensa-piernas.jpg
+  peso-muerto-rumano.jpg
+  zancadas.jpg
+  hip-thrust.jpg
+  extensiones-cuadriceps.jpg
+  curl-isquios.jpg
+  elevacion-talones.jpg
+
+HOMBROS
+  press-militar.jpg
+  press-arnold.jpg
+  elevaciones-laterales.jpg
+  elevaciones-frontales.jpg
+  pajaros.jpg
+  face-pulls.jpg
+  remo-al-cuello.jpg
+  encogimientos-hombros.jpg
+  press-bradford.jpg
+
+BRAZOS
+  curl-biceps-barra-z.jpg
+  curl-martillo.jpg
+  curl-arana.jpg
+  curl-predicador.jpg
+  extensiones-triceps-polea.jpg
+  press-frances.jpg
+  rompecraneos.jpg
+  fondos-triceps-banco.jpg
+  patada-triceps.jpg
+
+CORE
+  plancha.jpg
+  crunches-polea.jpg
+  elevacion-piernas-colgado.jpg
+  rueda-abdominal.jpg
+  giros-rusos.jpg
+  woodchoppers.jpg
+  dragon-flags.jpg
+  toques-talon.jpg
+  bicicletas-abdominales.jpg

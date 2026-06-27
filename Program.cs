@@ -2,6 +2,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
+using OverLoad.Application.Libreria;
 using OverLoad.Application.Nutricion;
 using OverLoad.Application.Ports;
 using OverLoad.Application.Progresion;
@@ -49,6 +50,9 @@ builder.Services.AddScoped<SelectorEstrategiaProgresion>();
 
 // Servicio de dominio de la calculadora metabólica (lógica pura, sin persistencia).
 builder.Services.AddScoped<CalculadoraMetabolica>();
+
+// Catálogo de ejercicios de la librería (datos estáticos del dominio).
+builder.Services.AddSingleton<CatalogoEjercicios>();
 
 // Documentacion de la API REST con OpenAPI / Swagger.
 builder.Services.AddEndpointsApiExplorer();
