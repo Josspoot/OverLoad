@@ -1,0 +1,276 @@
+@using OverLoad.Application.Nutricion
+@model OverLoad.Models.CalculadoraViewModel
+
+@{
+    ViewData["Title"] = "Calculadora";
+    var r = Model.Resultado;
+}
+
+<div class="page-wrapper">
+    <div class="bg-watermark">FUEL</div>
+
+    <div class="container content-container">
+        <h1 class="display-1 fw-bold mb-3" style="font-size: 5.5rem;">Calculadora metabólica</h1>
+        <p class="text-white-50 mb-5" style="font-size: 1.15rem; max-width: 720px;">
+            Estima tu metabolismo basal (TMB) y tu gasto calórico diario (TDEE). Ajusta las calorías a tu
+            objetivo, mira el desglose de macros y cuánto tardarías en lograrlo.
+        </p>
+
+        <!-- FORMULARIO -->
+        <div class="street-card mb-5">
+            <span class="card-badge">Datos</span>
+            <h5 class="mb-4" style="font-size: 2rem; color: var(--accent-red);">Tus datos</h5>
+
+            <form asp-controller="Calculadora" asp-action="Index" method="post" class="row g-4 align-items-end">
+                <div class="col-md-3">
+                    <label class="street-label">Sexo</label>
+                    <select asp-for="Sexo" class="form-select street-select">
+                        <option value="Hombre" style="color:black;">Hombre</option>
+                        <option value="Mujer" style="color:black;">Mujer</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="street-label">Edad (años)</label>
+                    <input asp-for="Edad" type="number" class="form-control street-input text-white" min="10" max="100" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="street-label">Peso (kg)</label>
+                    <input asp-for="PesoKg" type="number" step="0.1" class="form-control street-input text-white" min="30" max="300" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="street-label">Altura (cm)</label>
+                    <input asp-for="AlturaCm" type="number" step="0.1" class="form-control street-input text-white" min="100" max="250" required>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="street-label">Nivel de actividad</label>
+                    <select asp-for="NivelActividad" class="form-select street-select">
+                        <option value="Sedentario" style="color:black;">Sedentario (poco o nada de ejercicio)</option>
+                        <option value="Ligero" style="color:black;">Ligero (1-3 días/semana)</option>
+                        <option value="Moderado" style="color:black;">Moderado (3-5 días/semana)</option>
+                        <option value="Activo" style="color:black;">Activo (6-7 días/semana)</option>
+                        <option value="MuyActivo" style="color:black;">Extra activo (trabajo físico)</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="street-label">Objetivo</label>
+                    <select asp-for="Objetivo" class="form-select street-select">
+                        <option value="Mantenimiento" style="color:black;">Mantener peso</option>
+                        <option value="PerderPeso" style="color:black;">Perder peso</option>
+                        <option value="GanarMusculo" style="color:black;">Ganar músculo</option>
+                        <option value="SubirPeso" style="color:black;">Subir de peso</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="street-label">Fórmula</label>
+                    <select asp-for="Formula" class="form-select street-select">
+                        <option value="MifflinStJeor" style="color:black;">Mifflin-St Jeor (recomendada)</option>
+                        <option value="HarrisBenedict" style="color:black;">Harris-Benedict (clásica)</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="street-label">Meta de cambio de peso (kg)</label>
+                    <input asp-for="CambioPesoKg" type="number" step="0.5" class="form-control street-input text-white" min="0" max="100">
+                    <small class="text-white-50">Cuántos kg quieres ganar o perder (para estimar el tiempo).</small>
+                </div>
+                <div class="col-md-2 offset-md-6">
+                    <button type="submit" class="btn-pill-red w-100" style="padding: 14px 0;">Calcular</button>
+                </div>
+            </form>
+        </div>
+
+        @if (r is not null)
+        {
+            <!-- RESULTADO PRINCIPAL: TMB y TDEE -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4">
+                    <div class="street-card h-100 text-center">
+                        <div class="street-label mb-2">Metabolismo basal (TMB)</div>
+                        <div style="font-family: var(--font-display); font-size: 4rem; color: var(--accent-red); line-height: 1;">@r.Tmb</div>
+                        <div class="text-white-50">kcal/día en reposo</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="street-card h-100 text-center">
+                        <div class="street-label mb-2">Mantenimiento (TDEE)</div>
+                        <div style="font-family: var(--font-display); font-size: 4rem; color: var(--text-white); line-height: 1;">@r.Tdee</div>
+                        <div class="text-white-50">@r.NombreActividad · factor @r.FactorActividad</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="street-card h-100 text-center">
+                        <div class="street-label mb-2">Calorías objetivo</div>
+                        <div style="font-family: var(--font-display); font-size: 4rem; color: var(--accent-red); line-height: 1;">@r.CaloriasObjetivo</div>
+                        <div class="text-white-50">
+                            @r.NombreObjetivo
+                            @if (r.AjusteDiario != 0)
+                            {
+                                <span>(@(r.AjusteDiario > 0 ? "+" : "")@r.AjusteDiario kcal)</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORMULAS APLICADAS -->
+            <div class="street-card mb-4">
+                <span class="card-badge">Fórmulas</span>
+                <h5 class="mb-3" style="font-size: 1.6rem;">Fórmulas aplicadas (@r.NombreFormula)</h5>
+                <p class="mb-2 text-white-50">Fórmula general:</p>
+                <pre class="formula-box">@r.FormulaGenerica</pre>
+                <p class="mb-2 mt-3 text-white-50">Con tus datos:</p>
+                <pre class="formula-box">@r.FormulaCalculada</pre>
+                <p class="mb-2 mt-3 text-white-50">Gasto total (TDEE):</p>
+                <pre class="formula-box">TDEE = TMB × factor de actividad = @r.Tmb × @r.FactorActividad = @r.Tdee kcal</pre>
+                <p class="mb-0 mt-2 text-white-50" style="font-size: 0.95rem;">@r.DescripcionObjetivo</p>
+            </div>
+
+            <!-- CATEGORIAS DE MANTENIMIENTO -->
+            <h3 class="display-4 mb-3">Categorías de mantenimiento</h3>
+            <p class="text-white-50 mb-3">Calorías que mantendrían tu peso según tu nivel de actividad:</p>
+            <div class="table-responsive street-table-wrapper mb-5">
+                <table class="table street-table align-middle">
+                    <thead>
+                    <tr>
+                        <th>Nivel</th>
+                        <th>Descripción</th>
+                        <th class="text-center">Factor</th>
+                        <th class="text-center">Mantenimiento</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var c in r.Mantenimiento)
+                    {
+                        var actual = c.Nivel == r.NombreActividad;
+                        <tr style="@(actual ? "background-color:#161616;" : "")">
+                            <td class="fw-bold text-white" style="font-size: 1.2rem;">
+                                @c.Nivel
+                                @if (actual)
+                                {
+                                    <span class="badge ms-2" style="background-color: var(--accent-red);">Tú</span>
+                                }
+                            </td>
+                            <td class="text-white-50">@c.Descripcion</td>
+                            <td class="text-center text-white">@c.Factor</td>
+                            <td class="text-center fw-bold" style="font-size: 1.4rem; color: var(--accent-red);">@c.Calorias <span class="text-white-50" style="font-size:0.8rem;">kcal</span></td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- DESGLOSE DE MACROS + TIEMPO -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <div class="street-card h-100">
+                        <span class="card-badge">Desglose</span>
+                        <h5 class="mb-4" style="font-size: 1.6rem;">Macronutrientes para @r.CaloriasObjetivo kcal</h5>
+
+                        <div class="macro-row">
+                            <div><span class="macro-dot" style="background:var(--accent-red);"></span> Proteína</div>
+                            <div class="fw-bold text-white">@r.Macros.ProteinaG g <span class="text-white-50" style="font-size:0.85rem;">· @r.Macros.ProteinaKcal kcal</span></div>
+                        </div>
+                        <div class="macro-row">
+                            <div><span class="macro-dot" style="background:#FFB020;"></span> Grasas</div>
+                            <div class="fw-bold text-white">@r.Macros.GrasaG g <span class="text-white-50" style="font-size:0.85rem;">· @r.Macros.GrasaKcal kcal</span></div>
+                        </div>
+                        <div class="macro-row">
+                            <div><span class="macro-dot" style="background:#3FA7FF;"></span> Carbohidratos</div>
+                            <div class="fw-bold text-white">@r.Macros.CarbohidratoG g <span class="text-white-50" style="font-size:0.85rem;">· @r.Macros.CarboKcal kcal</span></div>
+                        </div>
+                        <p class="text-white-50 mt-3 mb-0" style="font-size: 0.9rem;">
+                            Proteína 2 g/kg · grasas 25% de las calorías · el resto en carbohidratos.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="street-card h-100">
+                        <span class="card-badge">Tiempo</span>
+                        <h5 class="mb-4" style="font-size: 1.6rem;">Estimación para tu objetivo</h5>
+                        @if (r.Tiempo is not null)
+                        {
+                            <div class="d-flex align-items-baseline gap-3 mb-2">
+                                <div style="font-family: var(--font-display); font-size: 4rem; color: var(--accent-red); line-height: 1;">@r.Tiempo.Semanas</div>
+                                <div class="text-white-50">semanas (~@r.Tiempo.Meses meses)</div>
+                            </div>
+                            <p class="text-white mb-2">
+                                Para @r.NombreObjetivo.ToLower() <strong>@r.Tiempo.CambioPesoKg kg</strong>
+                                a un ritmo aproximado de <strong>@r.Tiempo.RitmoSemanalKg kg/semana</strong>.
+                            </p>
+                            <p class="text-white-50 mb-0" style="font-size: 0.9rem;">@r.Tiempo.Nota</p>
+                        }
+                        else
+                        {
+                            <p class="text-white-50 mb-0">
+                                Elegiste <strong>mantenimiento</strong> (o no indicaste kg a cambiar), así que no hay un
+                                tiempo objetivo: el plan es sostener tu peso alrededor de @r.CaloriasObjetivo kcal/día.
+                            </p>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- MINI MENU DE IDEAS -->
+            <h3 class="display-4 mb-3">Mini menú de ideas</h3>
+            <p class="text-white-50 mb-3">Ejemplos sencillos para repartir tus calorías a lo largo del día (valores aproximados):</p>
+            <div class="row g-4 mb-5">
+                <div class="col-md-3">
+                    <div class="street-card h-100">
+                        <h6 class="menu-title">Desayuno</h6>
+                        <ul class="menu-list">
+                            <li>Avena con leche, plátano y maní <span>~450 kcal</span></li>
+                            <li>3 huevos + pan integral + fruta <span>~400 kcal</span></li>
+                            <li>Yogur griego con granola y miel <span>~350 kcal</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="street-card h-100">
+                        <h6 class="menu-title">Comida</h6>
+                        <ul class="menu-list">
+                            <li>Pechuga, arroz y verduras <span>~600 kcal</span></li>
+                            <li>Salmón, papa y ensalada <span>~650 kcal</span></li>
+                            <li>Carne magra, frijoles y tortillas <span>~700 kcal</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="street-card h-100">
+                        <h6 class="menu-title">Cena</h6>
+                        <ul class="menu-list">
+                            <li>Atún con ensalada y aguacate <span>~450 kcal</span></li>
+                            <li>Tortilla de huevo y vegetales <span>~400 kcal</span></li>
+                            <li>Pollo a la plancha y quinoa <span>~550 kcal</span></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="street-card h-100">
+                        <h6 class="menu-title">Snacks</h6>
+                        <ul class="menu-list">
+                            <li>Batido de proteína <span>~150 kcal</span></li>
+                            <li>Puñado de nueces <span>~200 kcal</span></li>
+                            <li>Fruta + yogur <span>~180 kcal</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LO QUE SE SABE -->
+            <div class="street-card">
+                <span class="card-badge">Contexto</span>
+                <h5 class="mb-3" style="font-size: 1.6rem;">Lo que se sabe de estas calculadoras</h5>
+                <ul class="info-list">
+                    <li>La <strong>TMB</strong> es la energía mínima que tu cuerpo gasta en reposo absoluto; el <strong>TDEE</strong> le suma tu actividad diaria.</li>
+                    <li><strong>Mifflin-St Jeor</strong> es considerada la más precisa para población general por la Academia de Nutrición y Dietética; <strong>Harris-Benedict</strong> es la clásica y tiende a sobreestimar un poco.</li>
+                    <li>Son <strong>estimaciones</strong> con un margen de error de aproximadamente ±10%. La composición corporal (más masa muscular = mayor gasto) influye y estas fórmulas no la miden.</li>
+                    <li>La regla de <strong>~7700 kcal ≈ 1 kg</strong> de peso corporal es una aproximación: el ritmo real depende de la adherencia, el sueño, el estrés y el metabolismo.</li>
+                    <li>Lo ideal es <strong>ajustar con la práctica</strong>: usa estos números como punto de partida y corrígelos según tu progreso real semana a semana.</li>
+                    <li>No sustituyen la valoración de un <strong>profesional de la salud o nutrición</strong>.</li>
+                </ul>
+            </div>
+        }
+    </div>
+</div>

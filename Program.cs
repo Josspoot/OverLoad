@@ -2,6 +2,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
+using OverLoad.Application.Nutricion;
 using OverLoad.Application.Ports;
 using OverLoad.Application.Progresion;
 using OverLoad.Application.Progresion.Estrategias;
@@ -45,6 +46,9 @@ builder.Services.AddScoped<IEstrategiaProgresion, ProgresionPorRepeticiones>();
 builder.Services.AddScoped<IEstrategiaProgresion, ProgresionPorSeries>();
 builder.Services.AddScoped<IEstrategiaProgresion, DobleProgresion>();
 builder.Services.AddScoped<SelectorEstrategiaProgresion>();
+
+// Servicio de dominio de la calculadora metabólica (lógica pura, sin persistencia).
+builder.Services.AddScoped<CalculadoraMetabolica>();
 
 // Documentacion de la API REST con OpenAPI / Swagger.
 builder.Services.AddEndpointsApiExplorer();

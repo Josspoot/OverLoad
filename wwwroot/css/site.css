@@ -243,3 +243,83 @@ h1, h2, h3, h4, h5, h6, .display-giant {
   padding: 30px 0;
   color: rgba(255, 255, 255, 0.3);
 }
+
+/* Calculadora metabólica */
+.formula-box {
+  background-color: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 3px solid var(--accent-red);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin: 0;
+  color: var(--text-white);
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.macro-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 1.15rem;
+}
+.macro-row:last-of-type {
+  border-bottom: none;
+}
+.macro-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.menu-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--accent-red);
+  letter-spacing: 1px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+}
+.menu-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.menu-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 0.95rem;
+  color: var(--text-light);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+.menu-list li:last-child {
+  border-bottom: none;
+}
+.menu-list li span {
+  color: var(--accent-red);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.info-list {
+  margin: 0;
+  padding-left: 20px;
+}
+.info-list li {
+  padding: 8px 0;
+  font-size: 1.05rem;
+  color: var(--text-light);
+  line-height: 1.5;
+}
+.info-list li strong {
+  color: var(--text-white);
+}
