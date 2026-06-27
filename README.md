@@ -12,6 +12,7 @@ Aplicación web para el seguimiento y control de entrenamientos físicos. Permit
 
 - **ASP.NET Core MVC** (.NET 10)
 - **Arquitectura Hexagonal** (puertos y adaptadores)
+- **Patrones de diseño GoF**: Strategy (comportamiento) y Decorator (estructural)
 - **API REST** documentada con **Swagger / OpenAPI** (Swashbuckle)
 - **Entity Framework Core** + SQLite
 - **ASP.NET Identity** (autenticación de usuarios)
@@ -69,7 +70,7 @@ OverLoad/
 │   ├── Services/
 │   └── Progresion/     # Patron Strategy: IEstrategiaProgresion + estrategias (ADR-04)
 ├── Infrastructure/     # Adaptadores de salida
-│   └── Persistence/    # EfEjercicioRepository (SQLite/EF Core)
+│   └── Persistence/    # EfEjercicioRepository (SQLite/EF Core) + decorador de logging (ADR-04)
 ├── Controllers/        # Adaptadores de entrada
 │   ├── HomeController.cs   # Web MVC
 │   ├── LibreriaController.cs
@@ -91,7 +92,7 @@ La documentación formal de las decisiones de diseño se encuentra en [`docs/adr
 - [`ADR-01`](docs/adr/ADR-01-Overload.md) — Elección del stack tecnológico y patrón MVC
 - [`ADR-02`](docs/adr/ADR-02-vistas-arquitectonicas.md) — Vistas arquitectónicas del sistema (lógica, física, despliegue y procesos)
 - [`ADR-03`](docs/adr/ADR-03-Arquitectura-hexagonal.md) — Adopción de Arquitectura Hexagonal (puertos y adaptadores) para soportar múltiples canales (web/móvil/API REST) y persistencia intercambiable (archivos/SQLite)
-- [`ADR-04`](docs/adr/ADR-04-Patron-Strategy-progresion.md) — Patrón Strategy (GoF) para encapsular las estrategias de progresión de carga de forma intercambiable y extensible
+- [`ADR-04`](docs/adr/ADR-04-Patrones-GoF.md) — Patrones de diseño GoF: **Strategy** (comportamiento) para las estrategias de progresión de carga y **Decorator** (estructural) para el logging de la persistencia
 
 ---
 

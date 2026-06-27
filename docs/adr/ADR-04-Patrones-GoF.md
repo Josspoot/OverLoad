@@ -1,4 +1,4 @@
-# ADR-04: Patrón Strategy para la progresión de carga
+# ADR-04: Patrones de diseño GoF (Strategy y Decorator)
 
 | Campo  | Valor |
 |--------|-------|
@@ -10,56 +10,82 @@
 
 ## Contexto
 
-**OverLoad** ayuda a registrar entrenamientos de fuerza aplicando el principio de **sobrecarga progresiva**: para seguir progresando, la carga de cada ejercicio debe aumentar con el tiempo. Hasta ahora la app solo guardaba los valores que el usuario tecleaba (`ActualizarCargaAsync`), sin ofrecer ninguna recomendación sobre **cómo** progresar.
+**OverLoad** registra entrenamientos de fuerza sobre una arquitectura hexagonal (ver ADR-03): un núcleo de dominio rodeado de puertos (`IEjercicioService`, `IEjercicioRepository`) y adaptadores (web MVC, API REST, persistencia EF Core/SQLite). Con la base ya funcional, surgieron dos necesidades concretas que conviene resolver con patrones de diseño en lugar de código ad hoc:
 
-El problema es que "progresar" no es una sola fórmula: en la práctica del entrenamiento existen varias formas válidas y de uso común de aplicar sobrecarga sobre un mismo ejercicio:
+1. **Variedad de progresiones de carga.** El principio de **sobrecarga progresiva** no tiene una única fórmula: se puede progresar subiendo peso, repeticiones, series o por doble progresión. La app debe **sugerir** la próxima carga eligiendo el método en tiempo de ejecución, y se espera que el catálogo de métodos **crezca**.
 
-- Subir el **peso** (orientado a fuerza).
-- Subir las **repeticiones** (orientado a hipertrofia/resistencia).
-- Agregar **series** (orientado a volumen).
-- **Doble progresión** (subir reps hasta un tope y, al alcanzarlo, subir peso y reiniciar reps).
-
-Quiero incorporar esta funcionalidad de sugerencia respetando la arquitectura ya adoptada (Hexagonal, ver ADR-03): la lógica debe vivir en el **núcleo de dominio**, ser fácil de extender con nuevas formas de progresión y poder consumirse desde cualquier adaptador de entrada (web MVC, API REST o un futuro cliente móvil).
+2. **Observabilidad de la persistencia.** Quiero registrar (logging) cada operación contra la base de datos y su duración para diagnosticar y evidenciar el comportamiento del sistema, **sin ensuciar** el adaptador de EF Core con código de logging ni repetirlo en cada método.
 
 Condiciones y restricciones que influyeron en la decisión:
 
-- Es un proyecto académico/personal con un solo desarrollador; la solución debe ser simple de mantener.
-- Se espera que el catálogo de progresiones **crezca** (más adelante podrían añadirse progresión por descanso, por tempo, etc.).
-- Ya uso **C#, Inyección de Dependencias (DI)** y la separación en puertos/adaptadores, base ideal para enchufar algoritmos intercambiables.
-- La selección de la progresión es un dato de entrada (lo elige el usuario), por lo que debe poder cambiarse **en tiempo de ejecución**, no de compilación.
+- Proyecto académico/personal con un solo desarrollador: las soluciones deben ser simples y mantenibles.
+- Ya uso **C#, Inyección de Dependencias (DI)** y la separación en puertos/adaptadores, base ideal para enchufar comportamientos intercambiables y envolventes.
+- Se busca respetar el principio **Open/Closed**: poder extender el sistema (nuevas progresiones, nuevos comportamientos de persistencia) **sin modificar** el código existente.
+- Requisito de la entrega: integrar **mínimo 2 patrones GoF de categorías distintas**.
 
 ---
 
 ## Decisión
 
-Aplicar el patrón de comportamiento **Strategy (GoF)** para encapsular cada algoritmo de progresión de carga.
+Integrar **dos patrones de diseño GoF de categorías diferentes**:
+
+| Patrón | Categoría | Problema que resuelve en OverLoad |
+|--------|-----------|-----------------------------------|
+| **Strategy** | Comportamiento | Encapsular cada algoritmo de progresión de carga como una clase intercambiable seleccionable en tiempo de ejecución. |
+| **Decorator** | Estructural | Añadir logging a las operaciones de persistencia envolviendo el repositorio, sin modificar el adaptador de EF Core. |
+
+### Patrón 1 — Strategy (comportamiento)
 
 Se introduce en el núcleo (`Application/Progresion`):
 
-- Una interfaz **`IEstrategiaProgresion`** (la *estrategia*) con el método `Sugerir(Ejercicio) -> CargaSugerida`, más una `Clave` y un `Nombre`.
+- La interfaz **`IEstrategiaProgresion`** (la *estrategia*) con `Sugerir(Ejercicio) -> CargaSugerida`, más `Clave` y `Nombre`.
 - Cuatro implementaciones intercambiables: **`ProgresionPorPeso`**, **`ProgresionPorRepeticiones`**, **`ProgresionPorSeries`** y **`DobleProgresion`**.
-- Un objeto de resultado **`CargaSugerida`** (record) que devuelve la carga propuesta y su justificación.
-- Un **`SelectorEstrategiaProgresion`** (el *contexto*) que recibe por DI **todas** las estrategias registradas y resuelve la adecuada a partir de su clave.
+- El objeto resultado **`CargaSugerida`** (record) con la carga propuesta y su justificación.
+- Un **`SelectorEstrategiaProgresion`** (el *contexto*) que recibe por DI **todas** las estrategias y resuelve la indicada por su clave.
 
-El servicio de aplicación `EjercicioService` expone el caso de uso `SugerirProgresionAsync(id, estrategia)`, y se añade el adaptador de entrada REST `GET /api/v1/ejercicios/{id}/sugerencia?estrategia={clave}`.
+Se expone como caso de uso `SugerirProgresionAsync(id, estrategia)` y como endpoint REST `GET /api/v1/ejercicios/{id}/sugerencia?estrategia={clave}`.
 
-### ¿Por qué?
+#### ¿Por qué Strategy?
 
-La característica concreta que resuelve mi problema es que **Strategy define una familia de algoritmos intercambiables detrás de una interfaz común**, de modo que:
+Porque **define una familia de algoritmos intercambiables tras una interfaz común**, lo que permite:
 
-- El algoritmo de progresión se **selecciona en tiempo de ejecución** según lo que pida el usuario (la clave `peso`, `repeticiones`, `series` o `doble`).
-- **Agregar una nueva progresión no obliga a modificar el código existente** (principio Open/Closed): basta crear una clase que implemente `IEstrategiaProgresion` y registrarla en DI; ni el `EjercicioService` ni el `SelectorEstrategiaProgresion` cambian.
-- Se elimina el `switch`/`if-else` gigante que tendría toda la lógica de progresión mezclada en el servicio, reemplazándolo por polimorfismo.
-- Cada algoritmo queda **aislado y probable** por separado, ya que las estrategias son clases puras del núcleo sin dependencias de ASP.NET ni EF Core.
+- **Seleccionar el algoritmo en tiempo de ejecución** según lo que pida el usuario (`peso`, `repeticiones`, `series`, `doble`).
+- **Agregar una nueva progresión sin modificar el código existente** (Open/Closed): basta crear una clase `IEstrategiaProgresion` y registrarla en DI; ni el servicio ni el selector cambian.
+- Sustituir un `switch`/`if-else` gigante por **polimorfismo**, dejando cada algoritmo aislado y probable por separado.
 
-### Alternativas consideradas
+#### Alternativas consideradas (Strategy)
 
 | Alternativa | Por qué la descarté |
 |-------------|---------------------|
-| **Bloque `switch`/`if-else` dentro de `EjercicioService`** | Concentra todas las reglas en un solo método; cada nueva progresión obliga a editar y reprobar ese método (rompe Open/Closed) y vuelve el servicio difícil de leer y mantener. |
-| **Una clase por progresión, pero invocada directamente desde el controlador** | Acopla el adaptador de entrada (web/API) a los algoritmos concretos y a su selección, duplicando esa lógica en cada canal (MVC y REST) y sacando reglas de negocio del núcleo. |
-| **Herencia: una clase base `Ejercicio` con subclases por tipo de progresión** | La progresión es un comportamiento que el usuario elige por sesión, no una característica fija de la entidad; modelarlo con herencia rigidiza el dominio y mezcla el "qué es" con el "cómo progresa". |
-| **Motor de reglas / configuración externa (p. ej. tabla de reglas)** | Sobredimensionado para cuatro algoritmos sencillos en un proyecto de un solo desarrollador; agrega complejidad e infraestructura sin un beneficio real a esta escala. |
+| **`switch`/`if-else` dentro de `EjercicioService`** | Concentra todas las reglas en un método; cada progresión nueva obliga a editarlo y reprobarlo (rompe Open/Closed) y lo vuelve ilegible. |
+| **Clases por progresión invocadas directo desde el controlador** | Acopla el adaptador de entrada a los algoritmos concretos y duplica la selección en cada canal (MVC y REST), sacando reglas del núcleo. |
+| **Herencia: subclases de `Ejercicio` por tipo de progresión** | La progresión es un comportamiento que se elige por sesión, no una propiedad fija de la entidad; con herencia se rigidiza el dominio. |
+| **Motor de reglas / configuración externa** | Sobredimensionado para cuatro algoritmos simples; agrega infraestructura sin beneficio real a esta escala. |
+
+### Patrón 2 — Decorator (estructural)
+
+Se introduce en infraestructura (`Infrastructure/Persistence`):
+
+- **`EjercicioRepositoryLogDecorator`** implementa el mismo puerto **`IEjercicioRepository`** y recibe en su constructor **otro** `IEjercicioRepository` (el componente decorado).
+- Cada método delega en el repositorio envuelto y le añade logging de inicio, fin, duración y errores.
+- En DI, el puerto `IEjercicioRepository` se resuelve al decorador, que envuelve al `EfEjercicioRepository` real.
+
+#### ¿Por qué Decorator?
+
+Porque **agrega responsabilidades a un objeto envolviéndolo, sin alterar su clase ni a sus consumidores**, lo que permite:
+
+- Sumar el logging **sin tocar** `EfEjercicioRepository` (Open/Closed): el adaptador de EF Core sigue haciendo solo persistencia.
+- Mantener **transparencia total**: como el decorador implementa `IEjercicioRepository`, el `EjercicioService` no se entera y sigue dependiendo solo del puerto.
+- **Activar o quitar** el comportamiento por configuración (DI), e incluso **apilar** más decoradores en el futuro (caché, validación, reintentos) sin cambios en el resto del sistema.
+
+#### Alternativas consideradas (Decorator)
+
+| Alternativa | Por qué la descarté |
+|-------------|---------------------|
+| **Meter el logging dentro de `EfEjercicioRepository`** | Mezcla dos responsabilidades (persistir + registrar) en una clase, rompe Single Responsibility y obliga a repetir el patrón de logging en cada método. |
+| **Herencia: una subclase de `EfEjercicioRepository` con logging** | Acopla el logging a esa implementación concreta; si mañana cambio a un adaptador de archivos JSON, pierdo el comportamiento y debo reescribirlo. |
+| **Middleware/filtro global de ASP.NET** | Opera a nivel HTTP, no a nivel del puerto de persistencia; no captura las operaciones reales del repositorio ni serviría a un canal no-web (cliente móvil, tarea en segundo plano). |
+| **AOP / interceptores (p. ej. Castle DynamicProxy)** | Resuelve lo mismo pero agrega una dependencia y "magia" en tiempo de ejecución innecesaria para un solo decorador explícito y legible. |
 
 ---
 
@@ -67,37 +93,48 @@ La característica concreta que resuelve mi problema es que **Strategy define un
 
 ### Lo que gano
 
-- **Técnica:** El sistema queda abierto a extensión: añadir una progresión nueva es crear una clase y registrarla en `Program.cs`, sin tocar el servicio, el selector ni los controladores. Las reglas viven en el núcleo y se reutilizan igual desde el sitio web y desde la API REST.
-- **Proceso/equipo:** Cada estrategia es una unidad pequeña, autocontenida y fácil de razonar y probar de forma aislada; esto facilita revisar, documentar y evolucionar las reglas de entrenamiento sin miedo a romper las demás.
+- **Técnica:** El sistema queda abierto a extensión en dos frentes sin tocar lo existente: agregar una progresión es crear una clase `IEstrategiaProgresion`; agregar un comportamiento de persistencia (caché, validación) es crear otro decorador. Ambas reglas viven detrás de los puertos ya definidos en el ADR-03, así que se reutilizan desde cualquier adaptador (web/API/móvil).
+- **Proceso/equipo:** Cada algoritmo y cada decorador es una unidad pequeña y autocontenida, fácil de revisar, documentar y probar de forma aislada. Además el logging del decorador da **evidencia visible** del funcionamiento del sistema, útil para depurar y para demostrar el avance.
 
 ### Lo que sacrifico o asumo
 
-- **Limitación técnica:** El patrón agrega más archivos y una indirección (interfaz + selector) que, para una sola progresión, sería innecesaria; el costo se justifica solo porque se esperan varios algoritmos.
-- **Deuda o riesgo:** La estrategia se selecciona por una **clave en texto** (`"peso"`, `"doble"`, ...); si crece el catálogo habrá que cuidar la validación de esas claves y, eventualmente, considerar tiparlas (enum) o versionarlas para no romper a los clientes de la API.
+- **Limitación técnica:** Ambos patrones agregan más archivos e indirección (interfaces, contexto, envoltura). Para un único algoritmo o sin necesidad de logging serían innecesarios; el costo se justifica por la variedad esperada y la separación de responsabilidades.
+- **Deuda o riesgo:** La estrategia se selecciona por una **clave de texto** que habrá que validar y, si crece, tipar (enum) o versionar para no romper a los clientes de la API. Y el cableado del Decorator en DI es **manual**: si se suman más decoradores habrá que ordenar bien la cadena de envoltura (o introducir un helper) para no equivocar el orden.
 
 ---
 
 ## Diagrama
 
-Estructura del patrón Strategy aplicado a la progresión de carga:
+Estructura de ambos patrones dentro de la arquitectura hexagonal:
 
 ```mermaid
 graph TD
     classDef default fill:#ffffff,stroke:#000000,stroke-width:1px,color:#000000;
 
-    subgraph Adaptadores_Entrada [Adaptadores de entrada]
-        Api[EjerciciosApiController\nGET /sugerencia]
+    subgraph Entrada [Adaptadores de entrada]
+        Api[EjerciciosApiController]
     end
 
     subgraph Nucleo [Nucleo de dominio - Application]
-        Service[EjercicioService\nSugerirProgresionAsync]
-        Selector[SelectorEstrategiaProgresion\nContexto]
-        IStrat[IEstrategiaProgresion\nEstrategia]
-        Peso[ProgresionPorPeso]
-        Reps[ProgresionPorRepeticiones]
-        Series[ProgresionPorSeries]
-        Doble[DobleProgresion]
-        Result[CargaSugerida]
+        Service[EjercicioService]
+
+        subgraph Strategy [Patron Strategy - comportamiento]
+            Selector[SelectorEstrategiaProgresion - Contexto]
+            IStrat[IEstrategiaProgresion]
+            Peso[ProgresionPorPeso]
+            Reps[ProgresionPorRepeticiones]
+            Series[ProgresionPorSeries]
+            Doble[DobleProgresion]
+        end
+
+        IRepo[IEjercicioRepository - Puerto de salida]
+    end
+
+    subgraph Salida [Adaptadores de salida - Infrastructure]
+        subgraph Decorator [Patron Decorator - estructural]
+            Deco[EjercicioRepositoryLogDecorator]
+            Ef[EfEjercicioRepository - EF Core / SQLite]
+        end
     end
 
     Api --> Service
@@ -107,5 +144,8 @@ graph TD
     IStrat -.implementan.-> Reps
     IStrat -.implementan.-> Series
     IStrat -.implementan.-> Doble
-    IStrat --> Result
+
+    Service --> IRepo
+    IRepo -.se resuelve a.-> Deco
+    Deco -->|envuelve| Ef
 ```
