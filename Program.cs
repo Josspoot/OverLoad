@@ -25,7 +25,16 @@ builder.Services.AddControllersWithViews();
 // Arquitectura hexagonal: se enchufan los adaptadores a los puertos vía DI.
 // El puerto de entrada (IEjercicioService) y el de salida (IEjercicioRepository)
 // pueden cambiar de implementación sin tocar el núcleo ni los controladores.
-builder.Services.AddScoped<IEjercicioRepository, EfEjercicioRepository>();
+// Patrón Decorator (ver ADR-04): el puerto de salida IEjercicioRepository se
+// resuelve a un decorador de logging que envuelve al adaptador real (EF Core).
+// El núcleo sigue dependiendo solo de IEjercicioRepository; el decorador es
+// transparente y se puede quitar comentando estas líneas.
+builder.Services.AddScoped<EfEjercicioRepository>();
+builder.Services.AddScoped<IEjercicioRepository>(sp =>
+    new EjercicioRepositoryLogDecorator(
+        sp.GetRequiredService<EfEjercicioRepository>(),
+        sp.GetRequiredService<ILogger<EjercicioRepositoryLogDecorator>>()));
+
 builder.Services.AddScoped<IEjercicioService, EjercicioService>();
 
 // Patrón Strategy (ver ADR-04): cada algoritmo de sobrecarga progresiva se
