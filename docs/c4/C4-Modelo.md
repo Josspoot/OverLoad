@@ -92,3 +92,79 @@ C4Container
   enchufan por inyección de dependencias.
 - El **Adaptador de Persistencia** es en realidad un `EfEjercicioRepository` envuelto por un
   `EjercicioRepositoryLogDecorator` (Decorator), transparente para el núcleo.
+
+---
+
+## C4 Nivel 3 — Diagrama de Componentes
+
+**¿Para quién es?** Desarrolladores que van a **modificar o extender el código** y necesitan saber
+qué clases viven dentro de la pieza principal y cómo colaboran.
+
+**¿Qué pregunta responde?** *¿Qué controladores, servicios y patrones GoF componen el núcleo de
+OverLoad y cómo se conectan a través de los puertos?*
+
+Se hace zoom sobre los adaptadores de entrada (controladores) y el **Núcleo de Aplicación**, hasta
+el adaptador de salida y la base de datos.
+
+```mermaid
+C4Component
+    title Nivel 3 - Componentes de OverLoad (nucleo y adaptadores)
+
+    Person(atleta, "Atleta / Usuario", "Navegador web.")
+    Person(cliente_api, "Consumidor de la API", "Cliente REST.")
+
+    Container_Boundary(entrada, "Adaptadores de entrada") {
+        Component(homeCtrl, "HomeController", "MVC Controller", "Tracker de ejercicios (CRUD) y libreria de ejercicios (accion Privacy).")
+        Component(calcCtrl, "CalculadoraController", "MVC Controller", "Calculadora metabolica: recibe datos y muestra TMB/TDEE, macros y estimaciones.")
+        Component(apiCtrl, "EjerciciosApiController", "Web API Controller", "Endpoints REST /api/v1/ejercicios: listar, obtener, crear, actualizar carga, sugerir progresion, eliminar.")
+    }
+
+    Container_Boundary(nucleo, "Nucleo de Aplicacion (hexagono)") {
+        Component(iservice, "IEjercicioService", "Puerto de entrada", "Contrato de casos de uso que exponen los adaptadores.")
+        Component(service, "EjercicioService", "Servicio de aplicacion", "Implementa los casos de uso: listar, registrar, actualizar carga, eliminar y sugerir progresion.")
+
+        Component(selector, "SelectorEstrategiaProgresion", "Strategy (contexto)", "Recibe todas las estrategias por DI y resuelve la adecuada por su clave.")
+        Component(strategies, "IEstrategiaProgresion + 4 estrategias", "Strategy (comportamiento)", "ProgresionPorPeso, PorRepeticiones, PorSeries y DobleProgresion: algoritmos intercambiables de sobrecarga progresiva.")
+
+        Component(calc, "CalculadoraMetabolica", "Servicio de dominio", "Logica pura de TMB/TDEE (Mifflin-St Jeor / Harris-Benedict), macros y estimacion de tiempo.")
+        Component(catalogo, "CatalogoEjercicios", "Servicio de dominio", "Catalogo estatico de 57 fichas de ejercicios de la libreria.")
+
+        Component(irepo, "IEjercicioRepository", "Puerto de salida", "Contrato de persistencia que necesita el nucleo.")
+    }
+
+    Container_Boundary(salida, "Adaptadores de salida") {
+        Component(decorator, "EjercicioRepositoryLogDecorator", "Decorator (estructural)", "Envuelve al repositorio real y agrega logging/medicion sin tocar el nucleo.")
+        Component(efrepo, "EfEjercicioRepository", "Adaptador EF Core", "Implementacion real de IEjercicioRepository sobre EF Core.")
+    }
+
+    ContainerDb(db, "SQLite", "Base de datos", "Ejercicios, Identity y migraciones.")
+
+    Rel(atleta, homeCtrl, "Usa", "HTTPS")
+    Rel(atleta, calcCtrl, "Usa", "HTTPS")
+    Rel(cliente_api, apiCtrl, "Consume", "JSON")
+
+    Rel(homeCtrl, iservice, "Invoca")
+    Rel(apiCtrl, iservice, "Invoca")
+    Rel(calcCtrl, calc, "Usa")
+    Rel(homeCtrl, catalogo, "Consulta fichas")
+
+    Rel(iservice, service, "Implementado por")
+    Rel(service, selector, "Delega la sugerencia de carga")
+    Rel(selector, strategies, "Selecciona y ejecuta")
+    Rel(service, irepo, "Persiste / consulta")
+
+    Rel(irepo, decorator, "Resuelto por DI a")
+    Rel(decorator, efrepo, "Envuelve (delega en)")
+    Rel(efrepo, db, "Lee / escribe", "EF Core / SQL")
+
+    UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")
+```
+
+**Notas del nivel**
+- **Patrón Strategy (comportamiento):** `SelectorEstrategiaProgresion` + las cuatro
+  `IEstrategiaProgresion` encapsulan algoritmos intercambiables de progresión. Agregar uno nuevo no
+  cambia al `EjercicioService`.
+- **Patrón Decorator (estructural):** `EjercicioRepositoryLogDecorator` envuelve a
+  `EfEjercicioRepository`; el núcleo solo ve el puerto `IEjercicioRepository`.
+- Los controladores dependen **solo de puertos y servicios de dominio**, nunca de EF Core — así se
+  mantiene la regla de dependencias de la arquitectura hexagonal (ver ADR-03 y ADR-04).
