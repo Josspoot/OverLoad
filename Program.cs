@@ -62,6 +62,10 @@ builder.Services.AddScoped<CalculadoraMetabolica>();
 // Catálogo de ejercicios de la librería (datos estáticos del dominio).
 builder.Services.AddSingleton<CatalogoEjercicios>();
 
+// Librería personalizada: catálogo base + ejercicios creados por el usuario.
+builder.Services.AddScoped<IEjercicioPersonalizadoRepository, EfEjercicioPersonalizadoRepository>();
+builder.Services.AddScoped<LibreriaService>();
+
 // Documentacion de la API REST con OpenAPI / Swagger.
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

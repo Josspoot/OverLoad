@@ -1,4 +1,6 @@
 @using OverLoad.Application.Libreria
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
 @model IReadOnlyList<GrupoEjercicios>
 
 @{
@@ -19,7 +21,23 @@
                 Explora los ejercicios por grupo muscular. Haz click en cualquiera para ver cómo hacerlo,
                 qué debes sentir, recomendaciones y el equipo extra que conviene usar.
             </p>
+
+            <div class="mt-4">
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <a asp-controller="Libreria" asp-action="Nueva" class="btn-pill-red d-inline-block" style="padding: 10px 28px; font-size: 1.05rem;">+ Añadir ejercicio</a>
+                }
+                else
+                {
+                    <a asp-area="Identity" asp-page="/Account/Login" class="btn-update-street d-inline-block" style="padding: 10px 28px;">Inicia sesión para añadir tus ejercicios</a>
+                }
+            </div>
         </div>
+
+        @if (TempData["LibreriaMensaje"] is string libMsg)
+        {
+            <div class="alert-street mx-auto mb-4" style="max-width: 1200px;">@libMsg</div>
+        }
 
         <div class="street-card mx-auto" style="max-width: 1200px;">
             <span class="card-badge">Catalog</span>

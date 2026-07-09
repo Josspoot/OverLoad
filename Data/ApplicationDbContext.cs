@@ -8,4 +8,5 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 {
     public DbSet<Ejercicio> Ejercicios => Set<Ejercicio>();
     public DbSet<PerfilMetabolico> PerfilesMetabolicos => Set<PerfilMetabolico>();
+    public DbSet<EjercicioPersonalizado> EjerciciosPersonalizados => Set<EjercicioPersonalizado>();
 }

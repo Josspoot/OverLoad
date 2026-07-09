@@ -1,0 +1,73 @@
+@model OverLoad.Models.NuevoEjercicioViewModel
+@{
+    ViewData["Title"] = "Nuevo ejercicio";
+}
+
+<div class="page-wrapper" style="min-height: 90vh; padding-top: 40px;">
+    <div class="bg-watermark" style="top: 25%;">CREATE</div>
+
+    <div class="container content-container" style="max-width: 900px;">
+        <div class="text-center mb-5">
+            <h1 class="display-giant" style="font-size: 5vw; line-height: 0.9;">Nuevo ejercicio</h1>
+            <p class="mx-auto" style="font-family: var(--font-body); color: #888; max-width: 620px;">
+                Completa la ficha. Tu ejercicio aparecerá en la librería junto al catálogo, con su
+                imagen descriptiva (marcador si aún no subes una) y toda su información.
+            </p>
+        </div>
+
+        <div class="street-card">
+            <span class="card-badge">Ficha</span>
+
+            <form asp-controller="Libreria" asp-action="Nueva" method="post" class="row g-4 mt-2">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="col-md-8">
+                    <label class="street-label" asp-for="Nombre"></label>
+                    <input asp-for="Nombre" class="form-control street-input" placeholder="Ej. Curl de bíceps en banco Scott" />
+                    <span asp-validation-for="Nombre" class="text-danger small"></span>
+                </div>
+                <div class="col-md-4">
+                    <label class="street-label" asp-for="Grupo"></label>
+                    <select asp-for="Grupo" class="form-select street-select">
+                        <option value="" style="color:black;">Selecciona...</option>
+                        @foreach (var g in OverLoad.Models.NuevoEjercicioViewModel.Grupos)
+                        {
+                            <option value="@g" style="color:black;">@g</option>
+                        }
+                    </select>
+                    <span asp-validation-for="Grupo" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12">
+                    <label class="street-label" asp-for="ComoHacerlo"></label>
+                    <textarea asp-for="ComoHacerlo" class="form-control street-input" rows="3" placeholder="Explica la técnica paso a paso."></textarea>
+                    <span asp-validation-for="ComoHacerlo" class="text-danger small"></span>
+                </div>
+
+                <div class="col-12">
+                    <label class="street-label" asp-for="QueSeDebeSentir"></label>
+                    <textarea asp-for="QueSeDebeSentir" class="form-control street-input" rows="2" placeholder="Qué músculos deben trabajar y qué NO deberías sentir."></textarea>
+                    <span asp-validation-for="QueSeDebeSentir" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="street-label" asp-for="Recomendaciones"></label>
+                    <textarea asp-for="Recomendaciones" class="form-control street-input" rows="2" placeholder="Rangos de reps, errores comunes, tempo..."></textarea>
+                </div>
+                <div class="col-md-6">
+                    <label class="street-label" asp-for="EquipoExtra"></label>
+                    <textarea asp-for="EquipoExtra" class="form-control street-input" rows="2" placeholder="Cinturón, straps, lastre o 'ninguno'."></textarea>
+                </div>
+
+                <div class="col-12 d-flex gap-3 mt-2">
+                    <button type="submit" class="btn-pill-red" style="padding: 12px 34px;">Guardar en mi librería</button>
+                    <a asp-controller="Home" asp-action="Privacy" class="btn-update-street d-inline-block" style="padding: 12px 30px;">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

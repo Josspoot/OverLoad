@@ -11,17 +11,17 @@ namespace OverLoad.Controllers;
 /// los casos de uso del núcleo a través del puerto IEjercicioService.
 /// No conoce EF Core ni la base de datos.
 /// </summary>
-public class HomeController(IEjercicioService ejercicios, CatalogoEjercicios catalogo) : Controller
+public class HomeController(IEjercicioService ejercicios, LibreriaService libreria) : Controller
 {
     public IActionResult Index()
     {
         return View();
     }
 
-    // Librería de ejercicios con sus fichas descriptivas.
-    public IActionResult Privacy()
+    // Librería de ejercicios: catálogo base + ejercicios personalizados del usuario.
+    public async Task<IActionResult> Privacy()
     {
-        return View(catalogo.ObtenerGrupos());
+        return View(await libreria.ObtenerGruposAsync());
     }
 
     public async Task<IActionResult> Tracker()
