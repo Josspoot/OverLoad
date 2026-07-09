@@ -27,12 +27,15 @@ public class EfEjercicioRepository(ApplicationDbContext context, IUsuarioActual 
     public async Task AgregarAsync(Ejercicio ejercicio)
     {
         ejercicio.UserId = usuario.Id;
+        ejercicio.UltimaActualizacion = DateTime.UtcNow;
         context.Ejercicios.Add(ejercicio);
         await context.SaveChangesAsync();
     }
 
     public async Task ActualizarAsync(Ejercicio ejercicio)
     {
+        // Cada ajuste de carga reinicia el reloj del recordatorio de progresión.
+        ejercicio.UltimaActualizacion = DateTime.UtcNow;
         context.Ejercicios.Update(ejercicio);
         await context.SaveChangesAsync();
     }

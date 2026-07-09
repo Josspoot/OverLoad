@@ -1,7 +1,13 @@
+@using OverLoad.Application.Progresion
 @model IEnumerable<OverLoad.Models.Ejercicio>
 
 @{
-ViewData["Title"] = "Tracker";
+    ViewData["Title"] = "Tracker";
+    var ahora = DateTime.UtcNow;
+    var pendientes = (Model ?? Enumerable.Empty<OverLoad.Models.Ejercicio>())
+        .Where(e => PoliticaProgresion.TocaProgresar(e.UltimaActualizacion, ahora))
+        .Select(e => e.Nombre)
+        .ToList();
 }
 
 <div class="page-wrapper">
@@ -13,6 +19,16 @@ ViewData["Title"] = "Tracker";
         @if (TempData["TrackerMensaje"] is string trkMsg)
         {
             <div class="alert-street mb-4">@trkMsg</div>
+        }
+
+        @if (pendientes.Count > 0)
+        {
+            <div class="alert-progresion mb-4">
+                <strong>Sobrecarga progresiva:</strong>
+                tienes @pendientes.Count ejercicio@(pendientes.Count == 1 ? "" : "s")
+                listo@(pendientes.Count == 1 ? "" : "s") para progresar
+                (@string.Join(", ", pendientes)). Sube peso, reps o series y actualiza la carga.
+            </div>
         }
 
         <div class="street-card mb-5">
@@ -83,8 +99,22 @@ ViewData["Title"] = "Tracker";
                 <tbody>
                 @foreach (var ejercicio in Model)
                 {
+                var toca = PoliticaProgresion.TocaProgresar(ejercicio.UltimaActualizacion, ahora);
+                var dias = PoliticaProgresion.DiasRestantes(ejercicio.UltimaActualizacion, ahora);
                 <tr>
-                    <td class="fw-bold text-white" style="font-size: 1.4rem;">@ejercicio.Nombre</td>
+                    <td class="fw-bold text-white" style="font-size: 1.4rem;">
+                        @ejercicio.Nombre
+                        <div class="mt-1">
+                            @if (toca)
+                            {
+                                <span class="badge-progresar">Toca progresar</span>
+                            }
+                            else
+                            {
+                                <span class="badge-revisar">Revisar en @dias día@(dias == 1 ? "" : "s")</span>
+                            }
+                        </div>
+                    </td>
 
                     <td><span class="badge border border-light text-white bg-transparent" style="letter-spacing: 0.5px; font-weight: 600;">@ejercicio.Enfoque</span></td>
 
@@ -126,3 +156,32 @@ ViewData["Title"] = "Tracker";
         }
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Recordatorio de sobrecarga progresiva vía Web Notifications API.
+        (function () {
+            const pendientes = @Html.Raw(Json.Serialize(pendientes));
+            if (!pendientes || pendientes.length === 0) return;
+            if (!('Notification' in window)) return;
+
+            function notificar() {
+                const cuerpo = pendientes.length === 1
+                    ? 'Toca progresar: ' + pendientes[0]
+                    : pendientes.length + ' ejercicios listos para progresar: ' + pendientes.join(', ');
+                new Notification('OverLoad · Sobrecarga progresiva', {
+                    body: cuerpo,
+                    tag: 'overload-progresion'
+                });
+            }
+
+            if (Notification.permission === 'granted') {
+                notificar();
+            } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission().then(function (p) {
+                    if (p === 'granted') notificar();
+                });
+            }
+        })();
+    </script>
+}

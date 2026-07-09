@@ -474,3 +474,41 @@ h1, h2, h3, h4, h5, h6, .display-giant {
     font-family: var(--font-body);
     font-weight: 600;
 }
+
+/* Recordatorio de sobrecarga progresiva */
+.alert-progresion {
+    background: rgba(255, 176, 32, 0.12);
+    border: 1px solid #ffb020;
+    color: #ffd98a;
+    border-radius: 10px;
+    padding: 14px 20px;
+    font-family: var(--font-body);
+}
+.badge-progresar {
+    display: inline-block;
+    background: var(--accent-red);
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    animation: pulseProgresar 1.6s infinite;
+}
+.badge-revisar {
+    display: inline-block;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.6);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+}
+@keyframes pulseProgresar {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,32,78,0.5); }
+    50% { box-shadow: 0 0 0 6px rgba(255,32,78,0); }
+}

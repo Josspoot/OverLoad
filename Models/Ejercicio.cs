@@ -12,4 +12,7 @@ public class Ejercicio
 
     /// <summary>Dueño del ejercicio (usuario del Tracker). Null = conjunto global (API).</summary>
     public string? UserId { get; set; }
+
+    /// <summary>Fecha (UTC) del último registro/ajuste de carga. Base del recordatorio de progresión.</summary>
+    public DateTime UltimaActualizacion { get; set; }
 }
