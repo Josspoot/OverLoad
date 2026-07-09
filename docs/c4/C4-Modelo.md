@@ -24,21 +24,22 @@ código **Mermaid** para que vivan versionados junto al código fuente y evoluci
 **¿Qué pregunta responde?** *¿Quién interactúa con el sistema y con qué sistemas externos se relaciona?*
 
 ```mermaid
-C4Context
-    title Nivel 1 - Contexto del sistema OverLoad
+flowchart TB
+    atleta["<b>Atleta / Usuario</b><br/><i>[Persona]</i><br/>Registra sus entrenamientos, consulta la librería de ejercicios y usa la calculadora metabólica."]
+    clienteApi["<b>Consumidor de la API</b><br/><i>[Persona / Sistema]</i><br/>App móvil o cliente externo que consume la API REST."]
+    overload["<b>OverLoad</b><br/><i>[Sistema de software]</i><br/>Aplicación web para registrar y dar seguimiento a entrenamientos de fuerza: progresión de cargas, librería de ejercicios y calculadora metabólica (TMB/TDEE)."]
+    identity["<b>ASP.NET Identity</b><br/><i>[Sistema externo]</i><br/>Gestión de cuentas, registro e inicio de sesión."]
 
-    Person(atleta, "Atleta / Usuario", "Persona que registra sus entrenamientos de fuerza, consulta la libreria de ejercicios y usa la calculadora metabolica.")
-    Person(cliente_api, "Consumidor de la API", "App movil o cliente externo que consume la API REST para el seguimiento de entrenamientos.")
+    atleta -->|"Registra entrenamientos y consulta<br/>HTTPS / navegador"| overload
+    clienteApi -->|"Consume casos de uso y sugerencias<br/>HTTPS / JSON (REST)"| overload
+    overload -->|"Autentica y autoriza usuarios<br/>ASP.NET Core Identity"| identity
 
-    System(overload, "OverLoad", "Aplicacion web para registrar y dar seguimiento a entrenamientos de fuerza: ejercicios, series, repeticiones, peso, progresion de cargas, libreria de ejercicios y calculadora metabolica (TMB/TDEE).")
-
-    System_Ext(identity, "ASP.NET Identity", "Gestion de cuentas, registro e inicio de sesion de los usuarios.")
-
-    Rel(atleta, overload, "Registra entrenamientos y consulta la libreria/calculadora", "HTTPS / navegador")
-    Rel(cliente_api, overload, "Consume casos de uso de ejercicios y sugerencias de progresion", "HTTPS / JSON (REST)")
-    Rel(overload, identity, "Autentica y autoriza usuarios", "ASP.NET Core Identity")
-
-    UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")
+    classDef persona fill:#08427b,stroke:#052e56,color:#ffffff;
+    classDef sistema fill:#1168bd,stroke:#0b4884,color:#ffffff;
+    classDef externo fill:#999999,stroke:#6b6b6b,color:#ffffff;
+    class atleta,clienteApi persona
+    class overload sistema
+    class identity externo
 ```
 
 **Notas del nivel**
@@ -58,31 +59,34 @@ desplegables** del sistema y cómo se comunican.
 **¿Qué pregunta responde?** *¿De qué bloques técnicos se compone OverLoad y qué tecnología usa cada uno?*
 
 ```mermaid
-C4Container
-    title Nivel 2 - Contenedores de OverLoad
+flowchart TB
+    atleta["<b>Atleta / Usuario</b><br/><i>[Persona]</i>"]
+    clienteApi["<b>Consumidor de la API</b><br/><i>[Persona / Sistema]</i>"]
+    identity["<b>ASP.NET Identity</b><br/><i>[Sistema externo]</i><br/>Autenticación y gestión de cuentas."]
 
-    Person(atleta, "Atleta / Usuario", "Usa el navegador web.")
-    Person(cliente_api, "Consumidor de la API", "App movil o cliente externo.")
+    subgraph overload["Sistema OverLoad"]
+        direction TB
+        web["<b>Aplicación Web MVC</b><br/><i>[ASP.NET Core MVC + Razor]</i><br/>Inicio, tracker de ejercicios, librería y calculadora. Adaptador de entrada."]
+        api["<b>API REST</b><br/><i>[ASP.NET Core Web API + Swagger]</i><br/>Casos de uso y sugerencias de progresión en JSON. Adaptador de entrada."]
+        nucleo["<b>Núcleo de Aplicación</b><br/><i>[C# / .NET]</i><br/>Casos de uso, puertos, Strategy y servicios de dominio. No conoce web ni base de datos."]
+        persistencia["<b>Adaptador de Persistencia</b><br/><i>[EF Core + Decorator]</i><br/>Implementa IEjercicioRepository; envuelto por un decorador de logging."]
+        db[("<b>Base de datos</b><br/><i>[SQLite]</i><br/>Ejercicios, Identity y migraciones.")]
+    end
 
-    System_Boundary(overload, "OverLoad") {
-        Container(web, "Aplicacion Web MVC", "ASP.NET Core MVC + Razor", "Sirve las paginas: inicio, tracker de ejercicios, libreria y calculadora. Adaptador de entrada (driving).")
-        Container(api, "API REST", "ASP.NET Core Web API + Swagger", "Expone los casos de uso de ejercicios y las sugerencias de progresion en JSON. Adaptador de entrada (driving).")
-        Container(nucleo, "Nucleo de Aplicacion", "C# / .NET (logica de dominio)", "Casos de uso, puertos (IEjercicioService / IEjercicioRepository), patron Strategy (progresion) y servicios de dominio (calculadora, catalogo). No conoce web ni base de datos.")
-        Container(persistencia, "Adaptador de Persistencia", "EF Core + Decorator de logging", "Implementa el puerto de salida IEjercicioRepository sobre EF Core. Envuelto por un decorador de logging (patron Decorator).")
-        ContainerDb(db, "Base de datos", "SQLite", "Almacena ejercicios, usuarios de Identity y migraciones.")
-    }
+    atleta -->|"Usa · HTTPS"| web
+    clienteApi -->|"Consume · HTTPS / JSON"| api
+    web -->|"Invoca casos de uso<br/>IEjercicioService"| nucleo
+    api -->|"Invoca casos de uso<br/>IEjercicioService"| nucleo
+    nucleo -->|"Persiste / consulta<br/>IEjercicioRepository"| persistencia
+    persistencia -->|"Lee / escribe<br/>EF Core / SQL"| db
+    web -->|"Autentica<br/>ASP.NET Identity"| identity
 
-    System_Ext(identity, "ASP.NET Identity", "Autenticacion y gestion de cuentas.")
-
-    Rel(atleta, web, "Usa", "HTTPS")
-    Rel(cliente_api, api, "Consume", "HTTPS / JSON")
-    Rel(web, nucleo, "Invoca casos de uso", "IEjercicioService")
-    Rel(api, nucleo, "Invoca casos de uso", "IEjercicioService")
-    Rel(nucleo, persistencia, "Persiste y consulta datos", "IEjercicioRepository")
-    Rel(persistencia, db, "Lee / escribe", "EF Core / SQL")
-    Rel(web, identity, "Autentica usuarios", "ASP.NET Identity")
-
-    UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")
+    classDef persona fill:#08427b,stroke:#052e56,color:#ffffff;
+    classDef externo fill:#999999,stroke:#6b6b6b,color:#ffffff;
+    classDef contenedor fill:#438dd5,stroke:#2e6295,color:#ffffff;
+    class atleta,clienteApi persona
+    class identity externo
+    class web,api,nucleo,persistencia,db contenedor
 ```
 
 **Notas del nivel**
@@ -107,57 +111,59 @@ Se hace zoom sobre los adaptadores de entrada (controladores) y el **Núcleo de 
 el adaptador de salida y la base de datos.
 
 ```mermaid
-C4Component
-    title Nivel 3 - Componentes de OverLoad (nucleo y adaptadores)
+flowchart TB
+    atleta["<b>Atleta / Usuario</b><br/><i>[Persona]</i>"]
+    clienteApi["<b>Consumidor de la API</b><br/><i>[Persona / Sistema]</i>"]
 
-    Person(atleta, "Atleta / Usuario", "Navegador web.")
-    Person(cliente_api, "Consumidor de la API", "Cliente REST.")
+    subgraph entrada["Adaptadores de entrada (driving)"]
+        direction LR
+        homeCtrl["<b>HomeController</b><br/><i>[MVC]</i><br/>Tracker (CRUD) y librería."]
+        calcCtrl["<b>CalculadoraController</b><br/><i>[MVC]</i><br/>TMB/TDEE, macros, estimaciones."]
+        apiCtrl["<b>EjerciciosApiController</b><br/><i>[Web API]</i><br/>/api/v1/ejercicios."]
+    end
 
-    Container_Boundary(entrada, "Adaptadores de entrada") {
-        Component(homeCtrl, "HomeController", "MVC Controller", "Tracker de ejercicios (CRUD) y libreria de ejercicios (accion Privacy).")
-        Component(calcCtrl, "CalculadoraController", "MVC Controller", "Calculadora metabolica: recibe datos y muestra TMB/TDEE, macros y estimaciones.")
-        Component(apiCtrl, "EjerciciosApiController", "Web API Controller", "Endpoints REST /api/v1/ejercicios: listar, obtener, crear, actualizar carga, sugerir progresion, eliminar.")
-    }
+    subgraph nucleo["Núcleo de Aplicación (hexágono)"]
+        iservice["<b>IEjercicioService</b><br/><i>[Puerto de entrada]</i>"]
+        service["<b>EjercicioService</b><br/><i>[Servicio de aplicación]</i>"]
+        selector["<b>SelectorEstrategiaProgresion</b><br/><i>[Strategy · contexto]</i>"]
+        strategies["<b>IEstrategiaProgresion + 4 estrategias</b><br/><i>[Strategy · comportamiento]</i>"]
+        calc["<b>CalculadoraMetabolica</b><br/><i>[Servicio de dominio]</i>"]
+        catalogo["<b>CatalogoEjercicios</b><br/><i>[Servicio de dominio]</i>"]
+        irepo["<b>IEjercicioRepository</b><br/><i>[Puerto de salida]</i>"]
+    end
 
-    Container_Boundary(nucleo, "Nucleo de Aplicacion (hexagono)") {
-        Component(iservice, "IEjercicioService", "Puerto de entrada", "Contrato de casos de uso que exponen los adaptadores.")
-        Component(service, "EjercicioService", "Servicio de aplicacion", "Implementa los casos de uso: listar, registrar, actualizar carga, eliminar y sugerir progresion.")
+    subgraph salida["Adaptadores de salida (driven)"]
+        direction LR
+        decorator["<b>EjercicioRepositoryLogDecorator</b><br/><i>[Decorator · estructural]</i>"]
+        efrepo["<b>EfEjercicioRepository</b><br/><i>[EF Core]</i>"]
+    end
 
-        Component(selector, "SelectorEstrategiaProgresion", "Strategy (contexto)", "Recibe todas las estrategias por DI y resuelve la adecuada por su clave.")
-        Component(strategies, "IEstrategiaProgresion + 4 estrategias", "Strategy (comportamiento)", "ProgresionPorPeso, PorRepeticiones, PorSeries y DobleProgresion: algoritmos intercambiables de sobrecarga progresiva.")
+    db[("<b>SQLite</b><br/><i>[Base de datos]</i>")]
 
-        Component(calc, "CalculadoraMetabolica", "Servicio de dominio", "Logica pura de TMB/TDEE (Mifflin-St Jeor / Harris-Benedict), macros y estimacion de tiempo.")
-        Component(catalogo, "CatalogoEjercicios", "Servicio de dominio", "Catalogo estatico de 57 fichas de ejercicios de la libreria.")
+    atleta --> homeCtrl
+    atleta --> calcCtrl
+    clienteApi --> apiCtrl
 
-        Component(irepo, "IEjercicioRepository", "Puerto de salida", "Contrato de persistencia que necesita el nucleo.")
-    }
+    homeCtrl -->|"Invoca"| iservice
+    apiCtrl -->|"Invoca"| iservice
+    calcCtrl -->|"Usa"| calc
+    homeCtrl -->|"Consulta fichas"| catalogo
 
-    Container_Boundary(salida, "Adaptadores de salida") {
-        Component(decorator, "EjercicioRepositoryLogDecorator", "Decorator (estructural)", "Envuelve al repositorio real y agrega logging/medicion sin tocar el nucleo.")
-        Component(efrepo, "EfEjercicioRepository", "Adaptador EF Core", "Implementacion real de IEjercicioRepository sobre EF Core.")
-    }
+    iservice -.->|"implementado por"| service
+    service -->|"delega la sugerencia"| selector
+    selector -->|"selecciona / ejecuta"| strategies
+    service -->|"persiste / consulta"| irepo
 
-    ContainerDb(db, "SQLite", "Base de datos", "Ejercicios, Identity y migraciones.")
+    irepo -.->|"DI resuelve a"| decorator
+    decorator -->|"envuelve (delega en)"| efrepo
+    efrepo -->|"Lee / escribe · EF Core / SQL"| db
 
-    Rel(atleta, homeCtrl, "Usa", "HTTPS")
-    Rel(atleta, calcCtrl, "Usa", "HTTPS")
-    Rel(cliente_api, apiCtrl, "Consume", "JSON")
-
-    Rel(homeCtrl, iservice, "Invoca")
-    Rel(apiCtrl, iservice, "Invoca")
-    Rel(calcCtrl, calc, "Usa")
-    Rel(homeCtrl, catalogo, "Consulta fichas")
-
-    Rel(iservice, service, "Implementado por")
-    Rel(service, selector, "Delega la sugerencia de carga")
-    Rel(selector, strategies, "Selecciona y ejecuta")
-    Rel(service, irepo, "Persiste / consulta")
-
-    Rel(irepo, decorator, "Resuelto por DI a")
-    Rel(decorator, efrepo, "Envuelve (delega en)")
-    Rel(efrepo, db, "Lee / escribe", "EF Core / SQL")
-
-    UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")
+    classDef persona fill:#08427b,stroke:#052e56,color:#ffffff;
+    classDef componente fill:#85bbf0,stroke:#5d82a8,color:#000000;
+    classDef datos fill:#438dd5,stroke:#2e6295,color:#ffffff;
+    class atleta,clienteApi persona
+    class homeCtrl,calcCtrl,apiCtrl,iservice,service,selector,strategies,calc,catalogo,irepo,decorator,efrepo componente
+    class db datos
 ```
 
 **Notas del nivel**
