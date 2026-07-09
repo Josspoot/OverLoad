@@ -33,6 +33,9 @@ builder.Services.AddScoped<IUsuarioActual, UsuarioActual>();
 // Persistencia del perfil metabólico (puente Calculadora -> Bitácora).
 builder.Services.AddScoped<IPerfilMetabolicoRepository, EfPerfilMetabolicoRepository>();
 
+// Registro diario de alimentos de la Bitácora.
+builder.Services.AddScoped<IRegistroAlimentoRepository, EfRegistroAlimentoRepository>();
+
 // Arquitectura hexagonal: se enchufan los adaptadores a los puertos vía DI.
 // El puerto de entrada (IEjercicioService) y el de salida (IEjercicioRepository)
 // pueden cambiar de implementación sin tocar el núcleo ni los controladores.

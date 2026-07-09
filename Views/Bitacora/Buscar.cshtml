@@ -1,0 +1,85 @@
+@model OverLoad.Models.BuscarAlimentoViewModel
+@{
+    ViewData["Title"] = "Añadir alimento";
+}
+
+<div class="page-wrapper" style="min-height: 90vh; padding-top: 40px;">
+    <div class="bg-watermark" style="top: 20%;">FOOD</div>
+
+    <div class="container content-container" style="max-width: 1000px;">
+
+        <div class="text-center mb-4">
+            <h1 class="display-giant" style="font-size: 5vw; line-height: 0.9;">Añadir alimento</h1>
+            <p class="mx-auto" style="font-family: var(--font-body); color:#888; max-width: 620px;">
+                Busca en <strong>Open Food Facts</strong>, elige el alimento, indica los gramos y se
+                registrará en tu Bitácora de hoy con sus calorías y macros.
+            </p>
+        </div>
+
+        <div class="street-card mb-4">
+            <form asp-controller="Bitacora" asp-action="Buscar" method="get" class="d-flex gap-3">
+                <input type="text" name="q" value="@Model.Termino" class="form-control street-input" placeholder="Ej. avena, pechuga de pollo, yogurt griego..." autofocus />
+                <button type="submit" class="btn-pill-red" style="padding: 10px 30px;">Buscar</button>
+            </form>
+        </div>
+
+        @if (Model.Buscado && Model.Resultados.Count == 0)
+        {
+            <div class="alert-street">No se encontraron alimentos para «@Model.Termino». Prueba con otro término.</div>
+        }
+
+        @if (Model.Resultados.Count > 0)
+        {
+            <p class="text-white-50 mb-3">@Model.Resultados.Count resultados · valores por 100 g</p>
+
+            <div class="row g-3">
+                @foreach (var a in Model.Resultados)
+                {
+                    <div class="col-md-6">
+                        <div class="street-card h-100">
+                            <div class="d-flex gap-3">
+                                <div class="alimento-thumb">
+                                    @if (!string.IsNullOrWhiteSpace(a.ImagenUrl))
+                                    {
+                                        <img src="@a.ImagenUrl" alt="@a.Nombre" loading="lazy"
+                                             onerror="this.style.display='none';" />
+                                    }
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-bold text-white" style="font-size: 1.1rem;">@a.Nombre</div>
+                                    @if (!string.IsNullOrWhiteSpace(a.Marca))
+                                    {
+                                        <div class="text-white-50" style="font-size: 0.85rem;">@a.Marca</div>
+                                    }
+                                    <div class="mt-1" style="font-size: 0.9rem;">
+                                        <span style="color: var(--accent-red); font-weight: 700;">@a.CaloriasPor100g.ToString("0") kcal</span>
+                                        <span class="text-white-50"> · P @a.ProteinaPor100g.ToString("0") · C @a.CarboPor100g.ToString("0") · G @a.GrasaPor100g.ToString("0")</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <form asp-controller="Bitacora" asp-action="Agregar" method="post" class="d-flex gap-2 align-items-center mt-3">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="Nombre" value="@a.Nombre" />
+                                <input type="hidden" name="Marca" value="@a.Marca" />
+                                <input type="hidden" name="CodigoBarras" value="@a.CodigoBarras" />
+                                <input type="hidden" name="CaloriasPor100g" value="@a.CaloriasPor100g.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+                                <input type="hidden" name="ProteinaPor100g" value="@a.ProteinaPor100g.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+                                <input type="hidden" name="CarboPor100g" value="@a.CarboPor100g.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+                                <input type="hidden" name="GrasaPor100g" value="@a.GrasaPor100g.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+                                <label class="text-white-50" style="font-size:0.85rem;">Gramos</label>
+                                <input type="number" name="Gramos" value="100" min="1" step="1" class="form-control street-input text-center text-white" style="width: 90px;" required />
+                                <button type="submit" class="btn-update-street ms-auto">Registrar</button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <div class="text-center mt-5">
+            <a asp-controller="Bitacora" asp-action="Index" class="btn-update-street d-inline-block" style="padding: 10px 30px;">Volver a la Bitácora</a>
+        </div>
+
+    </div>
+</div>

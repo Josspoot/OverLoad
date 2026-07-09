@@ -1,0 +1,147 @@
+@model OverLoad.Models.BitacoraViewModel
+@{
+    ViewData["Title"] = "Bitácora";
+}
+
+<div class="page-wrapper" style="min-height: 90vh; padding-top: 40px;">
+    <div class="bg-watermark" style="top: 20%;">DIARY</div>
+
+    <div class="container content-container" style="max-width: 1100px;">
+
+        <div class="d-flex flex-wrap justify-content-between align-items-end mb-4">
+            <div>
+                <h1 class="display-giant" style="font-size: 5vw; line-height: 0.9;">Bitácora</h1>
+                <p style="font-family: var(--font-body); color:#888; margin:0;">
+                    Registro de alimentos del @Model.Fecha.ToString("dd/MM/yyyy")
+                </p>
+            </div>
+            <a asp-controller="Bitacora" asp-action="Buscar" class="btn-pill-red d-inline-block" style="padding: 12px 30px; font-size: 1.05rem;">+ Añadir alimento</a>
+        </div>
+
+        @if (TempData["BitacoraMensaje"] is string bitMsg)
+        {
+            <div class="alert-street mb-4">@bitMsg</div>
+        }
+
+        @if (!Model.TienePerfil)
+        {
+            <div class="alert-progresion mb-4">
+                Aún no tienes un perfil metabólico. Ve a la
+                <a asp-controller="Calculadora" asp-action="Index" style="color:#ffd98a; text-decoration:underline;">Calculadora</a>,
+                calcula tu objetivo y se guardará como tu meta diaria para la barra de progreso.
+            </div>
+        }
+
+        <!-- PROGRESO PRINCIPAL: calorías vs objetivo -->
+        <div class="street-card mb-4">
+            <span class="card-badge">@(Model.Perfil?.NombreObjetivo ?? "Sin objetivo")</span>
+            <div class="d-flex justify-content-between align-items-end mb-2">
+                <h3 style="font-size: 1.8rem; margin:0;">Progreso calórico del día</h3>
+                <div class="text-end">
+                    <span style="font-size: 2.4rem; font-weight: 800; color: var(--accent-red);">@Model.CaloriasConsumidas.ToString("0")</span>
+                    <span class="text-white-50">/ @Model.CaloriasObjetivo.ToString("0") kcal</span>
+                </div>
+            </div>
+
+            <div class="progress-street">
+                <div class="progress-street-fill @(Model.HayExceso ? "exceso" : "")" style="width: @Model.PorcentajeCalorias%;"></div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-2" style="font-family: var(--font-body); font-size: 0.9rem;">
+                <span class="text-white-50">@Model.PorcentajeCaloriasReal% del objetivo</span>
+                @if (Model.HayExceso)
+                {
+                    <span style="color:#ff6b6b;">Te pasaste por @((Model.CaloriasConsumidas - Model.CaloriasObjetivo).ToString("0")) kcal</span>
+                }
+                else
+                {
+                    <span class="text-white-50">Te quedan @Model.CaloriasRestantes.ToString("0") kcal</span>
+                }
+            </div>
+        </div>
+
+        <!-- MACROS -->
+        @if (Model.TienePerfil)
+        {
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <div class="street-card h-100">
+                        <div class="macro-title">Proteína</div>
+                        <div class="mb-1"><strong>@Model.ProteinaConsumida.ToString("0")</strong> <span class="text-white-50">/ @Model.Perfil!.ProteinaG g</span></div>
+                        <div class="progress-street sm"><div class="progress-street-fill" style="width:@Model.PorcentajeMacro(Model.ProteinaConsumida, Model.Perfil!.ProteinaG)%;"></div></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="street-card h-100">
+                        <div class="macro-title">Carbohidratos</div>
+                        <div class="mb-1"><strong>@Model.CarboConsumido.ToString("0")</strong> <span class="text-white-50">/ @Model.Perfil!.CarbohidratoG g</span></div>
+                        <div class="progress-street sm"><div class="progress-street-fill" style="width:@Model.PorcentajeMacro(Model.CarboConsumido, Model.Perfil!.CarbohidratoG)%;"></div></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="street-card h-100">
+                        <div class="macro-title">Grasas</div>
+                        <div class="mb-1"><strong>@Model.GrasaConsumida.ToString("0")</strong> <span class="text-white-50">/ @Model.Perfil!.GrasaG g</span></div>
+                        <div class="progress-street sm"><div class="progress-street-fill" style="width:@Model.PorcentajeMacro(Model.GrasaConsumida, Model.Perfil!.GrasaG)%;"></div></div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- LISTA DEL DÍA -->
+        <div class="street-card">
+            <span class="card-badge">Registro</span>
+            <h3 style="font-size: 1.8rem; margin-bottom: 20px;">Alimentos de hoy</h3>
+
+            @if (Model.Registros.Count == 0)
+            {
+                <p class="text-white-50">Aún no has registrado alimentos hoy. Usa «Añadir alimento» para buscar en Open Food Facts.</p>
+            }
+            else
+            {
+                <div class="table-responsive street-table-wrapper">
+                    <table class="table street-table align-middle">
+                        <thead>
+                        <tr>
+                            <th>Alimento</th>
+                            <th class="text-center">Cantidad</th>
+                            <th class="text-center">Kcal</th>
+                            <th class="text-center">P</th>
+                            <th class="text-center">C</th>
+                            <th class="text-center">G</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var r in Model.Registros)
+                        {
+                            <tr>
+                                <td class="fw-bold text-white">
+                                    @r.Nombre
+                                    @if (!string.IsNullOrWhiteSpace(r.Marca))
+                                    {
+                                        <span class="text-white-50" style="font-weight:400; font-size:0.85rem;"> · @r.Marca</span>
+                                    }
+                                </td>
+                                <td class="text-center text-white-50">@r.Gramos.ToString("0") g</td>
+                                <td class="text-center fw-bold" style="color: var(--accent-red);">@r.Calorias.ToString("0")</td>
+                                <td class="text-center text-white-50">@r.Proteina.ToString("0")</td>
+                                <td class="text-center text-white-50">@r.Carbohidrato.ToString("0")</td>
+                                <td class="text-center text-white-50">@r.Grasa.ToString("0")</td>
+                                <td class="text-end">
+                                    <form asp-controller="Bitacora" asp-action="Eliminar" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@r.Id" />
+                                        <button type="submit" class="btn-delete-street">Quitar</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+
+    </div>
+</div>
