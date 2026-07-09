@@ -10,6 +10,7 @@ using OverLoad.Application.Progresion.Estrategias;
 using OverLoad.Application.Services;
 using OverLoad.Data;
 using OverLoad.Infrastructure.Identidad;
+using OverLoad.Infrastructure.OpenFoodFacts;
 using OverLoad.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -58,6 +59,15 @@ builder.Services.AddScoped<SelectorEstrategiaProgresion>();
 
 // Servicio de dominio de la calculadora metabólica (lógica pura, sin persistencia).
 builder.Services.AddScoped<CalculadoraMetabolica>();
+
+// Cliente HTTP tipado para Open Food Facts (adaptador del puerto IBuscadorAlimentos).
+// Open Food Facts pide un User-Agent descriptivo en cada petición.
+builder.Services.AddHttpClient<IBuscadorAlimentos, OpenFoodFactsClient>(client =>
+{
+    client.BaseAddress = new Uri("https://world.openfoodfacts.org/");
+    client.DefaultRequestHeaders.UserAgent.ParseAdd("OverLoad/1.0 (proyecto academico)");
+    client.Timeout = TimeSpan.FromSeconds(15);
+});
 
 // Catálogo de ejercicios de la librería (datos estáticos del dominio).
 builder.Services.AddSingleton<CatalogoEjercicios>();
