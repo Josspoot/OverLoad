@@ -451,3 +451,15 @@ h1, h2, h3, h4, h5, h6, .display-giant {
 .info-list li strong {
   color: var(--text-white);
 }
+/* Login en el navbar oscuro */
+.street-login .navbar-nav { flex-direction: row; align-items: center; gap: 6px; }
+.street-login .nav-link, .street-login .btn-link {
+    color: rgba(255,255,255,0.75) !important;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-decoration: none;
+    padding: 4px 10px;
+    white-space: nowrap;
+}
+.street-login .nav-link:hover, .street-login .btn-link:hover { color: var(--accent-red) !important; }

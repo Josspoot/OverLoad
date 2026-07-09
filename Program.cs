@@ -9,6 +9,7 @@ using OverLoad.Application.Progresion;
 using OverLoad.Application.Progresion.Estrategias;
 using OverLoad.Application.Services;
 using OverLoad.Data;
+using OverLoad.Infrastructure.Identidad;
 using OverLoad.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,13 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+// Acceso a la identidad del usuario autenticado sin acoplar el núcleo a ASP.NET.
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<IUsuarioActual, UsuarioActual>();
+
+// Persistencia del perfil metabólico (puente Calculadora -> Bitácora).
+builder.Services.AddScoped<IPerfilMetabolicoRepository, EfPerfilMetabolicoRepository>();
 
 // Arquitectura hexagonal: se enchufan los adaptadores a los puertos vía DI.
 // El puerto de entrada (IEjercicioService) y el de salida (IEjercicioRepository)

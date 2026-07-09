@@ -21,4 +21,7 @@ public class CalculadoraViewModel
 
     /// <summary>Resultado del cálculo; null mientras no se haya enviado el formulario.</summary>
     public ResultadoMetabolico? Resultado { get; set; }
+
+    /// <summary>True si el resultado se guardó como perfil activo (usuario autenticado).</summary>
+    public bool PerfilGuardado { get; set; }
 }
