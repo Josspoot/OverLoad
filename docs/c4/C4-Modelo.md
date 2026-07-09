@@ -168,3 +168,21 @@ C4Component
   `EfEjercicioRepository`; el núcleo solo ve el puerto `IEjercicioRepository`.
 - Los controladores dependen **solo de puertos y servicios de dominio**, nunca de EF Core — así se
   mantiene la regla de dependencias de la arquitectura hexagonal (ver ADR-03 y ADR-04).
+
+---
+
+## Declaración de uso de IA
+
+Para elaborar esta documentación C4 se utilizó una herramienta de inteligencia artificial
+(**Claude**, asistente de código) con el siguiente alcance:
+
+- **Qué se usó:** apoyo para **redactar y estructurar** los tres diagramas C4 en sintaxis Mermaid y
+  las notas explicativas de cada nivel, a partir de la inspección del código real del repositorio
+  (controladores, puertos, servicios y patrones ya implementados).
+- **Qué NO hizo la IA:** no diseñó ni modificó la arquitectura del sistema. La arquitectura
+  hexagonal, los patrones GoF (Strategy y Decorator) y las decisiones técnicas ya existían en el
+  proyecto y están documentadas en los ADR-01 a ADR-04.
+- **Verificación:** el autor revisó que cada componente, contenedor y relación de los diagramas
+  correspondiera con el código fuente y las decisiones previas del proyecto.
+- **Responsabilidad:** el contenido final, su exactitud y la entrega son responsabilidad del autor,
+  **Josué Enmanuel Poot Mateo**.
