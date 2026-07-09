@@ -47,3 +47,48 @@ C4Context
   arquitectura hexagonal; consume la misma lógica de negocio vía REST.
 - **ASP.NET Identity** se modela como sistema externo porque provee autenticación lista para usar,
   fuera del dominio propio de OverLoad.
+
+---
+
+## C4 Nivel 2 — Diagrama de Contenedores
+
+**¿Para quién es?** Desarrolladores y evaluadores técnicos que quieren ver **las piezas grandes
+desplegables** del sistema y cómo se comunican.
+
+**¿Qué pregunta responde?** *¿De qué bloques técnicos se compone OverLoad y qué tecnología usa cada uno?*
+
+```mermaid
+C4Container
+    title Nivel 2 - Contenedores de OverLoad
+
+    Person(atleta, "Atleta / Usuario", "Usa el navegador web.")
+    Person(cliente_api, "Consumidor de la API", "App movil o cliente externo.")
+
+    System_Boundary(overload, "OverLoad") {
+        Container(web, "Aplicacion Web MVC", "ASP.NET Core MVC + Razor", "Sirve las paginas: inicio, tracker de ejercicios, libreria y calculadora. Adaptador de entrada (driving).")
+        Container(api, "API REST", "ASP.NET Core Web API + Swagger", "Expone los casos de uso de ejercicios y las sugerencias de progresion en JSON. Adaptador de entrada (driving).")
+        Container(nucleo, "Nucleo de Aplicacion", "C# / .NET (logica de dominio)", "Casos de uso, puertos (IEjercicioService / IEjercicioRepository), patron Strategy (progresion) y servicios de dominio (calculadora, catalogo). No conoce web ni base de datos.")
+        Container(persistencia, "Adaptador de Persistencia", "EF Core + Decorator de logging", "Implementa el puerto de salida IEjercicioRepository sobre EF Core. Envuelto por un decorador de logging (patron Decorator).")
+        ContainerDb(db, "Base de datos", "SQLite", "Almacena ejercicios, usuarios de Identity y migraciones.")
+    }
+
+    System_Ext(identity, "ASP.NET Identity", "Autenticacion y gestion de cuentas.")
+
+    Rel(atleta, web, "Usa", "HTTPS")
+    Rel(cliente_api, api, "Consume", "HTTPS / JSON")
+    Rel(web, nucleo, "Invoca casos de uso", "IEjercicioService")
+    Rel(api, nucleo, "Invoca casos de uso", "IEjercicioService")
+    Rel(nucleo, persistencia, "Persiste y consulta datos", "IEjercicioRepository")
+    Rel(persistencia, db, "Lee / escribe", "EF Core / SQL")
+    Rel(web, identity, "Autentica usuarios", "ASP.NET Identity")
+
+    UpdateLayoutConfig($c4ShapeInRow="2", $c4BoundaryInRow="1")
+```
+
+**Notas del nivel**
+- **Web MVC** y **API REST** son dos adaptadores de entrada distintos que reutilizan el **mismo
+  núcleo** a través del puerto `IEjercicioService` — el beneficio clave de la arquitectura hexagonal.
+- El **Núcleo** define los puertos pero no depende de EF Core ni de ASP.NET; los adaptadores se
+  enchufan por inyección de dependencias.
+- El **Adaptador de Persistencia** es en realidad un `EfEjercicioRepository` envuelto por un
+  `EjercicioRepositoryLogDecorator` (Decorator), transparente para el núcleo.
