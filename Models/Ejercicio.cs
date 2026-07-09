@@ -9,4 +9,7 @@ public class Ejercicio
     public int Repeticiones { get; set; }
     public double Peso { get; set; }
     public int Esfuerzo { get; set; }
+
+    /// <summary>Dueño del ejercicio (usuario del Tracker). Null = conjunto global (API).</summary>
+    public string? UserId { get; set; }
 }

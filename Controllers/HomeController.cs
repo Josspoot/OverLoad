@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OverLoad.Application.Libreria;
 using OverLoad.Application.Ports;
@@ -24,12 +25,14 @@ public class HomeController(IEjercicioService ejercicios, LibreriaService librer
         return View(await libreria.ObtenerGruposAsync());
     }
 
+    [Authorize]
     public async Task<IActionResult> Tracker()
     {
         var lista = await ejercicios.ListarAsync();
         return View(lista);
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Crear(Ejercicio nuevoEjercicio)
     {
@@ -37,6 +40,31 @@ public class HomeController(IEjercicioService ejercicios, LibreriaService librer
         return RedirectToAction("Tracker");
     }
 
+    // Crea una entrada de Tracker a partir de un ejercicio de la Librería.
+    // Se registra con cargas por defecto que el usuario ajusta luego.
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> AgregarDesdeLibreria(string nombre, string grupo)
+    {
+        if (!string.IsNullOrWhiteSpace(nombre))
+        {
+            await ejercicios.RegistrarAsync(new Ejercicio
+            {
+                Nombre = nombre,
+                Enfoque = string.IsNullOrWhiteSpace(grupo) ? "General" : grupo,
+                Series = 3,
+                Repeticiones = 10,
+                Peso = 0,
+                Esfuerzo = 5
+            });
+            TempData["TrackerMensaje"] = $"«{nombre}» se añadió a tu Tracker. Ajusta series, reps y peso.";
+        }
+
+        return RedirectToAction("Tracker");
+    }
+
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> NuevaCarga(int id, int nuevasSeries, int nuevasRepeticiones, double nuevoPeso)
     {
@@ -44,6 +72,7 @@ public class HomeController(IEjercicioService ejercicios, LibreriaService librer
         return RedirectToAction("Tracker");
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Eliminar(int id)
     {

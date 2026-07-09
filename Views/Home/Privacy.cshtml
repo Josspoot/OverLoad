@@ -127,6 +127,17 @@
                     <p id="m-equipo"></p>
                 </div>
             </div>
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <div class="modal-footer border-0">
+                    <form asp-controller="Home" asp-action="AgregarDesdeLibreria" method="post" class="w-100">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="nombre" id="m-tracker-nombre" />
+                        <input type="hidden" name="grupo" id="m-tracker-grupo" />
+                        <button type="submit" class="btn-pill-red w-100" style="padding: 12px 0;">+ Añadir al Tracker</button>
+                    </form>
+                </div>
+            }
         </div>
     </div>
 </div>
@@ -143,6 +154,11 @@
             document.getElementById('m-sentir').textContent = b.getAttribute('data-sentir');
             document.getElementById('m-reco').textContent = b.getAttribute('data-reco');
             document.getElementById('m-equipo').textContent = b.getAttribute('data-equipo');
+
+            const tNombre = document.getElementById('m-tracker-nombre');
+            const tGrupo = document.getElementById('m-tracker-grupo');
+            if (tNombre) { tNombre.value = b.getAttribute('data-nombre'); }
+            if (tGrupo) { tGrupo.value = b.getAttribute('data-grupo'); }
 
             const img = document.getElementById('m-img');
             const ph = document.getElementById('m-img-ph');
