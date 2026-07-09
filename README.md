@@ -15,7 +15,9 @@ Aplicación web para el seguimiento y control de entrenamientos físicos. Permit
 - **Patrones de diseño GoF**: Strategy (comportamiento) y Decorator (estructural)
 - **API REST** documentada con **Swagger / OpenAPI** (Swashbuckle)
 - **Entity Framework Core** + SQLite
-- **ASP.NET Identity** (autenticación de usuarios)
+- **ASP.NET Identity** (autenticación y datos por usuario)
+- **API externa**: [Open Food Facts](https://world.openfoodfacts.org/) (búsqueda de alimentos)
+- **Web Notifications API** (recordatorio de sobrecarga progresiva)
 - **Razor Views** (HTML + CSS con modo oscuro)
 - **Bootstrap 5**
 
@@ -27,7 +29,11 @@ Aplicación web para el seguimiento y control de entrenamientos físicos. Permit
 - Actualización de carga (series, repeticiones y peso) por ejercicio
 - Eliminación de ejercicios del tracker
 - Sugerencia de sobrecarga progresiva por ejercicio, con estrategias intercambiables (por peso, repeticiones, series o doble progresión)
-- Autenticación de usuarios con ASP.NET Identity
+- **Librería editable**: además del catálogo, cada usuario crea sus propios ejercicios (fichas) y los envía al Tracker con un clic
+- **Recordatorio de sobrecarga progresiva** (14 días por ejercicio): aviso en la app y notificación del navegador
+- **Calculadora metabólica** (TMB/TDEE, macros y estimación de tiempo); guarda el perfil activo del usuario
+- **Bitácora nutricional**: registro diario de alimentos con búsqueda en Open Food Facts y barra de progreso de calorías/macros según el objetivo
+- Autenticación de usuarios con ASP.NET Identity (datos por usuario)
 - Diseño oscuro optimizado para uso en gimnasio
 - API REST (CRUD de ejercicios) con documentación interactiva Swagger UI, lista para futuros clientes (móvil)
 
@@ -93,6 +99,7 @@ La documentación formal de las decisiones de diseño se encuentra en [`docs/adr
 - [`ADR-02`](docs/adr/ADR-02-vistas-arquitectonicas.md) — Vistas arquitectónicas del sistema (lógica, física, despliegue y procesos)
 - [`ADR-03`](docs/adr/ADR-03-Arquitectura-hexagonal.md) — Adopción de Arquitectura Hexagonal (puertos y adaptadores) para soportar múltiples canales (web/móvil/API REST) y persistencia intercambiable (archivos/SQLite)
 - [`ADR-04`](docs/adr/ADR-04-Patrones-GoF.md) — Patrones de diseño GoF: **Strategy** (comportamiento) para las estrategias de progresión de carga y **Decorator** (estructural) para el logging de la persistencia
+- [`ADR-05`](docs/adr/ADR-05-Nutricion-y-Bitacora.md) — Módulo de nutrición y **Bitácora**: datos por usuario (Identity), perfil metabólico como puente Calculadora→Bitácora, **Open Food Facts** tras un puerto y recordatorio de progresión (14 días) con notificaciones
 
 ---
 
