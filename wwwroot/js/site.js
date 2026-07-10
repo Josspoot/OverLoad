@@ -24,12 +24,10 @@
         });
     }
 
-    var MINI_KEY = 'overload-nav-mini';
-
     function toggle(el, cls, on) { if (el) el.classList.toggle(cls, on); }
 
     function openPanel() {
-        closeNav();
+        collapseNav();
         toggle(document.getElementById('settingsPanel'), 'open', true);
         toggle(document.getElementById('settingsOverlay'), 'open', true);
         document.body.style.overflow = 'hidden';
@@ -40,27 +38,25 @@
         document.body.style.overflow = '';
     }
 
-    function openNav() {
+    // El rail de navegación siempre está visible (iconos); expandir muestra los nombres.
+    function expandNav() {
         closePanel();
-        toggle(document.getElementById('navDrawer'), 'open', true);
+        toggle(document.getElementById('navDrawer'), 'expanded', true);
         toggle(document.getElementById('navOverlay'), 'open', true);
-        document.body.style.overflow = 'hidden';
     }
-    function closeNav() {
-        toggle(document.getElementById('navDrawer'), 'open', false);
+    function collapseNav() {
+        toggle(document.getElementById('navDrawer'), 'expanded', false);
         toggle(document.getElementById('navOverlay'), 'open', false);
-        document.body.style.overflow = '';
     }
-
-    function applyMini() {
-        var mini = localStorage.getItem(MINI_KEY) === '1';
-        toggle(document.getElementById('navDrawer'), 'mini', mini);
+    function toggleNav() {
+        var drawer = document.getElementById('navDrawer');
+        if (drawer && drawer.classList.contains('expanded')) collapseNav();
+        else expandNav();
     }
 
     document.addEventListener('DOMContentLoaded', function () {
         // Sincroniza el marcado del panel con el tema ya aplicado.
         applyTheme(currentTheme());
-        applyMini();
 
         // Panel de configuración.
         var gear = document.getElementById('settingsGear');
@@ -70,17 +66,11 @@
         if (closeBtn) closeBtn.addEventListener('click', closePanel);
         if (overlay) overlay.addEventListener('click', closePanel);
 
-        // Menú de navegación (hamburguesa) con estado comprimido persistente.
-        var burger = document.getElementById('navHamburger');
+        // Rail de navegación: el botón lo expande/comprime; el fondo lo comprime.
         var navOverlay = document.getElementById('navOverlay');
         var collapseBtn = document.getElementById('navCollapse');
-        if (burger) burger.addEventListener('click', openNav);
-        if (navOverlay) navOverlay.addEventListener('click', closeNav);
-        if (collapseBtn) collapseBtn.addEventListener('click', function () {
-            var drawer = document.getElementById('navDrawer');
-            var mini = drawer && drawer.classList.toggle('mini');
-            try { localStorage.setItem(MINI_KEY, mini ? '1' : '0'); } catch (e) { /* modo privado */ }
-        });
+        if (collapseBtn) collapseBtn.addEventListener('click', toggleNav);
+        if (navOverlay) navOverlay.addEventListener('click', collapseNav);
 
         document.querySelectorAll('.theme-option').forEach(function (opt) {
             opt.addEventListener('click', function () {
@@ -89,7 +79,7 @@
         });
 
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') { closePanel(); closeNav(); }
+            if (e.key === 'Escape') { closePanel(); collapseNav(); }
         });
     });
 })();

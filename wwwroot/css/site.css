@@ -131,7 +131,8 @@ body {
   font-family: var(--font-body);
   overflow-x: hidden;
   margin: 0;
-  padding: 0;
+  /* Deja espacio para el rail de navegación siempre visible (icono). */
+  padding: 0 0 0 82px;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -1060,63 +1061,66 @@ h1, h2, h3, h4, h5, h6, .display-giant {
 /* =====================================================================
    MENÚ LATERAL DE NAVEGACIÓN (off-canvas izquierdo, con iconos)
    ===================================================================== */
+/* Oscurecedor detrás del rail cuando está expandido (flyout). */
 .nav-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(4, 12, 24, 0.55);
+  background: rgba(4, 12, 24, 0.5);
   backdrop-filter: blur(2px);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease;
-  z-index: 1055;
+  z-index: 1058;
 }
 .nav-overlay.open { opacity: 1; visibility: visible; }
 
+/* Rail de navegación SIEMPRE visible en modo icono; se expande al hacer clic. */
 .nav-drawer {
   position: fixed;
   top: 0;
   left: 0;
   height: 100%;
-  width: 264px;
+  width: 82px;
   background: var(--surface);
   border-right: 1px solid var(--border);
-  box-shadow: 24px 0 60px rgba(0, 0, 0, 0.28);
-  transform: translateX(-105%);
-  transition: transform 0.38s cubic-bezier(0.16, 0.84, 0.44, 1), width 0.3s ease;
   z-index: 1060;
   display: flex;
   flex-direction: column;
-  padding: 20px 14px;
+  padding: 16px 12px;
   overflow: hidden;
+  transition: width 0.32s cubic-bezier(0.16, 0.84, 0.44, 1), box-shadow 0.32s ease;
 }
-.nav-drawer.open { transform: translateX(0); }
-.nav-drawer.mini { width: 82px; }
+.nav-drawer.expanded {
+  width: 264px;
+  box-shadow: 24px 0 60px rgba(0, 0, 0, 0.28);
+}
 
 .nav-drawer-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 8px;
-  padding: 4px 8px 16px;
+  padding: 2px 2px 14px;
   margin-bottom: 8px;
   border-bottom: 1px solid var(--border);
 }
+.nav-drawer.expanded .nav-drawer-head { justify-content: space-between; padding-left: 8px; }
 .nav-drawer-brand {
   font-family: var(--font-display);
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   letter-spacing: 1px;
   color: var(--heading);
   white-space: nowrap;
-  overflow: hidden;
+  display: none;
 }
-.nav-drawer.mini .nav-drawer-brand { opacity: 0; width: 0; }
+.nav-drawer.expanded .nav-drawer-brand { display: block; }
 .nav-collapse-btn {
   background: transparent;
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text-muted);
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1126,13 +1130,14 @@ h1, h2, h3, h4, h5, h6, .display-giant {
 }
 .nav-collapse-btn:hover { border-color: var(--accent); color: var(--accent); }
 .nav-collapse-btn svg { width: 18px; height: 18px; transition: transform 0.3s ease; }
-.nav-drawer.mini .nav-collapse-btn svg { transform: rotate(180deg); }
+.nav-drawer.expanded .nav-collapse-btn svg { transform: rotate(180deg); }
 
 .navitem {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 14px;
-  padding: 12px 14px;
+  padding: 12px 0;
   border-radius: 10px;
   color: var(--text);
   text-decoration: none;
@@ -1143,10 +1148,10 @@ h1, h2, h3, h4, h5, h6, .display-giant {
   transition: background 0.2s ease, color 0.2s ease;
   margin-bottom: 4px;
 }
+.nav-drawer.expanded .navitem { justify-content: flex-start; padding: 12px 14px; }
 .navitem svg { width: 22px; height: 22px; flex: 0 0 auto; }
-.navitem .navitem-label { overflow: hidden; transition: opacity 0.2s ease; }
-.nav-drawer.mini .navitem { justify-content: center; padding: 12px 0; }
-.nav-drawer.mini .navitem .navitem-label { display: none; }
+.navitem .navitem-label { display: none; }
+.nav-drawer.expanded .navitem .navitem-label { display: inline; }
 .navitem:hover { background: var(--surface-2); color: var(--accent); }
 .navitem.active {
   background: var(--accent-soft);
