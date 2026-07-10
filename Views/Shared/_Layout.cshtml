@@ -1,5 +1,13 @@
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
+@{
+    var _rd = ViewContext.RouteData.Values;
+    var _cc = _rd["controller"] as string ?? "";
+    var _ca = _rd["action"] as string ?? "";
+    Func<string, string, string> nav = (c, a) =>
+        string.Equals(_cc, c, StringComparison.OrdinalIgnoreCase)
+        && string.Equals(_ca, a, StringComparison.OrdinalIgnoreCase) ? "active" : "";
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,33 +32,13 @@
 </head>
 <body>
 <header>
-    <nav class="navbar navbar-expand-sm street-navbar">
-        <div class="container-fluid px-4">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">OVERLOAD</a>
-
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-center">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link street-nav-link" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link street-nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Librería</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link street-nav-link" asp-area="" asp-controller="Home" asp-action="Tracker">Tracker</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link street-nav-link" asp-area="" asp-controller="Calculadora" asp-action="Index">Calculadora</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link street-nav-link" asp-area="" asp-controller="Bitacora" asp-action="Index">Bitácora</a>
-                    </li>
-                </ul>
+    <nav class="navbar street-navbar">
+        <div class="container-fluid px-4 street-nav-inner">
+            <div class="nav-left">
+                <button type="button" class="nav-hamburger" id="navHamburger" title="Menú" aria-label="Abrir menú">
+                    <span class="hamburger-bars"></span>
+                </button>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">OVERLOAD</a>
             </div>
 
             <button type="button" class="settings-gear" id="settingsGear" title="Configuración" aria-label="Abrir configuración">
@@ -62,6 +50,40 @@
         </div>
     </nav>
 </header>
+
+@* ===== Menú de navegación lateral (oculto, se abre con la hamburguesa) ===== *@
+<div class="nav-overlay" id="navOverlay"></div>
+<nav class="nav-drawer" id="navDrawer" aria-label="Navegación principal">
+    <div class="nav-drawer-head">
+        <span class="nav-drawer-brand">Menú</span>
+        <button type="button" class="nav-collapse-btn" id="navCollapse" title="Comprimir / expandir" aria-label="Comprimir menú">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M15 18l-6-6 6-6"></path>
+            </svg>
+        </button>
+    </div>
+
+    <a class="navitem @nav("Home","Index")" asp-controller="Home" asp-action="Index" title="Inicio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h5v-6h4v6h5V9.5"></path></svg>
+        <span class="navitem-label">Inicio</span>
+    </a>
+    <a class="navitem @nav("Home","Privacy")" asp-controller="Home" asp-action="Privacy" title="Librería">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5v-13A2.5 2.5 0 0 1 6.5 3z"></path><path d="M9 3v18"></path></svg>
+        <span class="navitem-label">Librería</span>
+    </a>
+    <a class="navitem @nav("Home","Tracker")" asp-controller="Home" asp-action="Tracker" title="Tracker">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 8L9 4l-3 8H2"></path></svg>
+        <span class="navitem-label">Tracker</span>
+    </a>
+    <a class="navitem @nav("Calculadora","Index")" asp-controller="Calculadora" asp-action="Index" title="Calculadora">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"></rect><path d="M9 7h6"></path><path d="M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01"></path></svg>
+        <span class="navitem-label">Calculadora</span>
+    </a>
+    <a class="navitem @nav("Bitacora","Index")" asp-controller="Bitacora" asp-action="Index" title="Bitácora">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"></rect><path d="M9 4V3h6v1"></path><path d="M9 10h6M9 14h6M9 17h4"></path></svg>
+        <span class="navitem-label">Bitácora</span>
+    </a>
+</nav>
 
 <main role="main">
     @RenderBody()
@@ -93,10 +115,10 @@
     </button>
 
     <button type="button" class="theme-option" data-theme="dark">
-        <span class="theme-swatch" style="background: linear-gradient(135deg,#111,#000); --sw-accent:#FF204E;"></span>
+        <span class="theme-swatch" style="background: linear-gradient(135deg,#1a1a1a,#000); --sw-accent:#E6B325;"></span>
         <span class="theme-meta">
-            <span class="theme-name">Oscuro Rojo</span>
-            <span class="theme-desc">Estilo street de gimnasio</span>
+            <span class="theme-name">Negro y Dorado</span>
+            <span class="theme-desc">Oscuro elegante con acento dorado</span>
         </span>
         <span class="theme-check">&#10003;</span>
     </button>
