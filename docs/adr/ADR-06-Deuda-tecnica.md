@@ -120,3 +120,77 @@ Aplicar **Extracción de configuración con el patrón Options** (refactor
 
 **Resultado:** la configuración deja de ser código; cambiar de ambiente o de
 credencial ya no requiere recompilar ni arriesgar filtrar secretos en Git.
+
+---
+
+## Deuda técnica #2 — Código muerto y comentarios engañosos tras el refactor del menú
+
+### Qué es
+
+Cuando el menú de navegación pasó de ser una **hamburguesa desplegable** a un
+**rail lateral siempre visible que se expande al clic**, se cambió el marcado y
+el JavaScript, pero **quedaron restos del diseño anterior**:
+
+1. **CSS muerto** en `wwwroot/css/site.css`: las reglas `.nav-hamburger` y
+   `.hamburger-bars` (aprox. líneas **1022–1059**), incluidos sus
+   pseudo-elementos `::before`/`::after`, ya no tienen ningún elemento que las
+   use — el botón de la hamburguesa se eliminó del `_Layout.cshtml`.
+2. **Comentario engañoso** en `Views/Shared/_Layout.cshtml` línea **49**:
+
+   ```html
+   @* ===== Menú de navegación lateral (oculto, se abre con la hamburguesa) ===== *@
+   ```
+
+   El menú **ya no está oculto** ni se abre con una hamburguesa: está siempre
+   visible. El comentario miente sobre el comportamiento actual.
+3. **Alias CSS de compatibilidad** en `:root` (site.css líneas 52–56):
+   `--accent-red`, `--text-white`, `--text-light`, `--bg-dark`, `--bg-black`.
+   Se crearon como puente para que los estilos *inline* viejos que aún usan
+   `var(--accent-red)` no se rompieran al introducir los tokens semánticos.
+   Estas variables *inline* siguen esparcidas en **5 vistas**
+   (`Home/Index`, `Home/Tracker`, `Bitacora/Index`, `Bitacora/Buscar`,
+   `Calculadora/Index`), duplicando el vocabulario de diseño.
+
+### Por qué existe
+
+Es **descuido no detectado a tiempo** combinado con un atajo consciente. Al
+refactorizar el nav bajo presión de entrega, se priorizó que la nueva versión
+funcionara y se dejó el código viejo "por si acaso", sin volver a limpiarlo.
+Los alias `--accent-red` etc. fueron un atajo deliberado para **no tener que
+editar las 5 vistas** en ese momento: era más rápido crear un alias que hacer
+*buscar y reemplazar* en todos los archivos.
+
+### Costo de no pagarla
+
+- **Ventanas rotas:** el código muerto hace creer que la hamburguesa todavía
+  existe. Un futuro desarrollador (o yo mismo en unos meses) puede perder
+  tiempo intentando "arreglar" o reutilizar reglas que no hacen nada.
+- **Comentarios que mienten** son peor que no tener comentarios: inducen a
+  decisiones equivocadas.
+- **Doble vocabulario de diseño:** mientras existan `--accent-red` y `--accent`
+  para lo mismo, cada estilo nuevo puede elegir el equivocado, y una futura
+  limpieza de temas tendrá que rastrear ambos. Si alguien borra el alias sin
+  buscar sus usos, **5 vistas pierden su color** silenciosamente (no hay error
+  de compilación en CSS).
+- El archivo `site.css` (1160 líneas) sigue creciendo con peso muerto, lo que
+  ralentiza su lectura y mantenimiento.
+
+### Propuesta de solución
+
+Aplicar **Eliminación de código muerto** + **Reemplazo por búsqueda y
+sustitución** (*refactor "Remove Dead Code" + "Rename/Consolidate"*):
+
+1. **Borrar** las reglas `.nav-hamburger` y `.hamburger-bars` (y sus
+   pseudo-elementos) de `site.css`. Verificar con una búsqueda global que
+   ningún marcado las referencia antes de eliminar.
+2. **Corregir el comentario** de `_Layout.cshtml:49` para que describa el
+   comportamiento real ("rail lateral siempre visible que se expande al clic").
+3. **Consolidar el vocabulario de diseño:** hacer *buscar y reemplazar* de
+   `var(--accent-red)` → `var(--accent)`, `var(--text-white)` → `var(--heading)`,
+   etc. en las 5 vistas, y **luego eliminar los alias** de `:root`. Con esto
+   queda un único conjunto de *tokens* semánticos.
+4. (Opcional) Añadir estos pasos como *checklist* de "limpieza post-refactor"
+   para no volver a dejar restos.
+
+**Resultado:** el CSS refleja solo lo que la app hace hoy, los comentarios
+dicen la verdad y hay una sola fuente de verdad para los colores del tema.
