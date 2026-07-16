@@ -194,3 +194,42 @@ sustitución** (*refactor "Remove Dead Code" + "Rename/Consolidate"*):
 
 **Resultado:** el CSS refleja solo lo que la app hace hoy, los comentarios
 dicen la verdad y hay una sola fuente de verdad para los colores del tema.
+
+---
+
+## Consecuencias y compensaciones
+
+### Lo que gano al documentar esta deuda
+
+- **Visibilidad:** la deuda deja de ser conocimiento tácito en la cabeza del
+  autor y queda registrada con ubicación exacta y plan de pago.
+- **Priorización informada:** se puede decidir *cuándo* pagar cada deuda con
+  datos (costo vs. esfuerzo) en lugar de descubrirla en el peor momento.
+
+### Lo que asumo
+
+- Documentar no es pagar: las deudas siguen presentes hasta ejecutar los
+  refactores. Este ADR es el compromiso de saldarlas, no el saldo.
+- La Deuda #1 debe atenderse **antes** de cualquier despliegue real o de
+  introducir credenciales verdaderas; la Deuda #2 es de menor riesgo y puede
+  pagarse de forma incremental.
+
+---
+
+## Declaración de uso de IA
+
+Para la elaboración de este ADR se utilizó **Claude Code (Anthropic)** como
+asistente. El uso concreto fue:
+
+- **Análisis del repositorio:** la IA inspeccionó `appsettings.json`,
+  `Program.cs`, `wwwroot/css/site.css` y `Views/Shared/_Layout.cshtml` para
+  identificar deuda técnica **real y específica** (ubicaciones y líneas
+  concretas), en lugar de ejemplos genéricos.
+- **Redacción:** la IA ayudó a estructurar y redactar el documento siguiendo el
+  formato de los ADR previos del proyecto (ADR-01 a ADR-05).
+
+La **verificación de que las deudas son reales**, la decisión de cuáles
+documentar y la validación del contenido son responsabilidad del autor. El
+código, las decisiones de arquitectura y este repositorio son trabajo propio;
+la IA fue una herramienta de apoyo para análisis y redacción, no la autora del
+proyecto.
