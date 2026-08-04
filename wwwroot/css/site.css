@@ -1158,3 +1158,120 @@ h1, h2, h3, h4, h5, h6, .display-giant {
   color: var(--accent);
   box-shadow: inset 3px 0 0 var(--accent);
 }
+
+/* =====================================================================
+   DISEÑO ADAPTABLE (RESPONSIVE) — celular / tablet / PC
+   El grid de las vistas ya es de Bootstrap (col-md-*), así que las
+   columnas se apilan solas. Aquí se ajustan los componentes propios
+   (rail, tarjetas, tablas, tipografías) y, en celular, el rail lateral
+   se reemplaza por una barra de navegación inferior.
+   ===================================================================== */
+
+/* Barra inferior: oculta por defecto (solo aparece en celular). */
+.nav-bottom { display: none; }
+
+/* ---------- Tablet (<= 992px) ---------- */
+@media (max-width: 992px) {
+  .street-card { padding: 28px; }
+  .page-wrapper { padding: 44px 0 80px; }
+  .street-navbar { padding: 1rem 0; }
+  .street-navbar .navbar-brand { font-size: 2.1rem; }
+  .street-table th { font-size: 1.05rem; padding: 14px 16px !important; }
+  .street-table td { padding: 14px 16px !important; }
+  .muscle-title { font-size: 2rem; }
+}
+
+/* ---------- Celular (<= 768px): rail -> barra inferior ---------- */
+@media (max-width: 768px) {
+  /* El contenido ya no necesita hueco para el rail; se reserva abajo
+     para la barra de navegación inferior fija. */
+  body {
+    padding-left: 0;
+    padding-bottom: calc(66px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Se ocultan el rail lateral y su flyout en celular. */
+  .nav-drawer,
+  .nav-overlay { display: none !important; }
+
+  /* Barra de navegación inferior fija con los mismos 5 destinos. */
+  .nav-bottom {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 66px;
+    background: var(--nav-bg);
+    backdrop-filter: saturate(180%) blur(10px);
+    border-top: 1px solid var(--border);
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.14);
+    z-index: 1060;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+    justify-content: space-around;
+    align-items: stretch;
+  }
+  .navitem-b {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-family: var(--font-body);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    border-radius: 10px;
+    padding: 4px 2px;
+    transition: color 0.2s ease, background 0.2s ease;
+  }
+  .navitem-b svg { width: 23px; height: 23px; flex: 0 0 auto; }
+  .navitem-b span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .navitem-b:active { background: var(--surface-2); }
+  .navitem-b.active { color: var(--accent); }
+
+  /* Densidad y tipografías para celular. */
+  .street-card { padding: 20px; border-radius: 12px; }
+  .page-wrapper { padding: 26px 0 48px; min-height: auto; }
+  .street-navbar { padding: 0.7rem 0; }
+  .street-navbar .navbar-brand { font-size: 1.9rem; letter-spacing: 1px; }
+
+  h1, .display-giant { font-size: clamp(2rem, 11vw, 3rem); }
+  .muscle-title { font-size: 1.7rem; }
+  .auth-title { font-size: 2.1rem; }
+  .auth-card { padding: 30px 22px; }
+  .auth-wrap { padding: 32px 14px; min-height: calc(100vh - 150px); }
+  .bg-watermark { font-size: 34vw; top: 22%; }
+
+  /* Tablas: se deslizan en horizontal en vez de cortarse. */
+  .street-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .street-table th {
+    font-size: 0.95rem;
+    padding: 12px 14px !important;
+    white-space: nowrap;
+  }
+  .street-table td { padding: 12px 14px !important; }
+
+  /* El panel de configuración ocupa casi todo el ancho. */
+  .settings-panel { width: 320px; padding: 22px 18px 32px; }
+}
+
+/* ---------- Pantallas muy chicas (<= 400px) ---------- */
+@media (max-width: 400px) {
+  .street-card { padding: 16px; }
+  .street-navbar .navbar-brand { font-size: 1.6rem; }
+  .nav-bottom { height: 60px; }
+  .navitem-b span { display: none; } /* si no caben, solo iconos */
+  .navitem-b svg { width: 25px; height: 25px; }
+  body { padding-bottom: calc(60px + env(safe-area-inset-bottom, 0px)); }
+}
